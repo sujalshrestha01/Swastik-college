@@ -3,6 +3,7 @@ import { Link, NavLink } from 'react-router-dom';
 import { Menu, X, Sun, Moon, Hexagon } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useSettings } from '../context/SettingsContext';
+import logo from '../../assets/swastik-logo.png';
 
 const LINKS = [
   { to: '/', label: 'Home' },
@@ -22,10 +23,10 @@ export default function Navbar() {
     <header className="sticky top-0 z-40 bg-paper/90 dark:bg-navy-900/90 backdrop-blur border-b border-navy-100 dark:border-navy-700">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 shrink-0" onClick={() => setOpen(false)}>
-          <Hexagon className="text-marigold" size={26} strokeWidth={2.2} fill="#1B2A4A" />
-          <span className="font-display font-semibold text-lg text-navy dark:text-paper">
+          <img src={logo} alt="Logo" className="h-10" />
+          {/* <span className="font-display font-semibold text-lg text-navy dark:text-paper">
             {settings.collegeName}
-          </span>
+          </span> */}
         </Link>
 
         <div className="hidden md:flex items-center gap-8">

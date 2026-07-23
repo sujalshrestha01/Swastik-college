@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { MapPin, Phone, Mail, Hexagon, ShieldCheck } from 'lucide-react';
 import { useSettings } from '../context/SettingsContext';
+import logo from '../../assets/swastik-logo.png';
 
 function Facebook(props) {
   return (
@@ -60,8 +61,9 @@ export default function Footer() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-navy-700">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <Hexagon className="text-marigold" size={22} fill="#1B2A4A" />
-              <span className="font-display text-lg text-paper">{settings.collegeName}</span>
+              {/* <Hexagon className="text-marigold" size={22} fill="#1B2A4A" /> */}
+              <img src={logo} alt="Logo" className="h-10" />
+              {/* <span className="font-display text-lg text-paper">{settings.collegeName}</span> */}
             </div>
             <p className="text-sm leading-relaxed">
               {settings.footerNote}
