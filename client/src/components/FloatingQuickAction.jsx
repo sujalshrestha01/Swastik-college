@@ -1,0 +1,42 @@
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Plus, X, MessageCircle, ClipboardEdit } from 'lucide-react';
+
+export default function FloatingQuickAction() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3">
+      {open && (
+        <div className="flex flex-col gap-2 items-end animate-[fadeIn_0.15s_ease-out]">
+          <Link
+            to="/contact"
+            className="flex items-center gap-2 bg-white dark:bg-navy-800 border border-navy-100 dark:border-navy-700 shadow-lg text-navy dark:text-paper text-sm font-medium pl-4 pr-3 py-2.5 rounded-full hover:border-marigold-300 transition-colors"
+          >
+            Chat with Admissions
+            <span className="w-7 h-7 rounded-full bg-teal-50 dark:bg-navy-700 text-teal-600 dark:text-teal-400 flex items-center justify-center">
+              <MessageCircle size={14} />
+            </span>
+          </Link>
+          <Link
+            to="/contact"
+            className="flex items-center gap-2 bg-white dark:bg-navy-800 border border-navy-100 dark:border-navy-700 shadow-lg text-navy dark:text-paper text-sm font-medium pl-4 pr-3 py-2.5 rounded-full hover:border-marigold-300 transition-colors"
+          >
+            Apply Now
+            <span className="w-7 h-7 rounded-full bg-marigold-50 dark:bg-navy-700 text-marigold-600 dark:text-marigold-300 flex items-center justify-center">
+              <ClipboardEdit size={14} />
+            </span>
+          </Link>
+        </div>
+      )}
+      <button
+        onClick={() => setOpen((o) => !o)}
+        aria-label={open ? 'Close quick actions' : 'Open quick actions'}
+        aria-expanded={open}
+        className="w-14 h-14 rounded-full bg-marigold hover:bg-marigold-500 text-navy-900 shadow-lg flex items-center justify-center transition-transform hover:scale-105"
+      >
+        {open ? <X size={22} /> : <Plus size={22} />}
+      </button>
+    </div>
+  );
+}
