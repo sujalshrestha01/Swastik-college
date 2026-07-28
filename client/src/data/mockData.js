@@ -51,24 +51,6 @@ export const programs = [
     ],
     syllabusUrl: '/syllabus/bca.pdf',
   },
-  {
-    slug: 'bbs',
-    name: 'BBS',
-    tagline: 'Bachelor of Business Studies',
-    duration: '4 years · 8 semesters',
-    seats: 60,
-    description:
-      'A foundational management degree covering accounting, economics and organizational behaviour for future business leaders.',
-    eligibility: [
-      'Completed +2 / A-Level in any stream',
-      'Minimum second division or GPA 2.0 in +2',
-    ],
-    semesters: [
-      { title: 'Semester I', courses: ['Principles of Management', 'Business English', 'Microeconomics', 'Business Mathematics'] },
-      { title: 'Semester II', courses: ['Financial Accounting', 'Business Statistics', 'Macroeconomics', 'Business Communication'] },
-    ],
-    syllabusUrl: '/syllabus/bbs.pdf',
-  },
 ];
 
 export const notices = [
