@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Mail, GraduationCap } from 'lucide-react';
-import { getFaculty } from '../api/client';
+import { getFaculty, resolveImageUrl } from '../api/client';
+import { Section } from '../components/Visibility';
 
 export default function Faculty() {
   const [faculty, setFaculty] = useState([]);
@@ -11,12 +12,15 @@ export default function Faculty() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
+      <Section page="faculty" section="hero">
       <p className="font-mono text-xs tracking-[0.2em] text-teal-600 dark:text-teal-400 uppercase mb-2">Our People</p>
       <h1 className="font-display text-3xl sm:text-4xl font-medium text-navy dark:text-paper mb-3">Faculty & Staff</h1>
       <p className="text-navy-400 dark:text-navy-200 max-w-2xl mb-10">
         Meet the educators and administrators guiding students through their academic journey.
       </p>
+      </Section>
 
+      <Section page="faculty" section="grid">
       {faculty.length === 0 ? (
         <p className="text-navy-400 text-sm">Faculty information will appear here soon.</p>
       ) : (
@@ -25,7 +29,7 @@ export default function Faculty() {
             <div key={f._id} className="border border-navy-100 dark:border-navy-700 rounded-xl p-6 bg-white dark:bg-navy-800">
               <div className="w-14 h-14 rounded-full bg-navy-100 dark:bg-navy-700 flex items-center justify-center overflow-hidden mb-4">
                 {f.photoUrl ? (
-                  <img src={f.photoUrl} alt={f.name} className="w-full h-full object-cover" />
+                  <img src={resolveImageUrl(f.photoUrl)} alt={f.name} className="w-full h-full object-cover" />
                 ) : (
                   <GraduationCap className="text-navy-400" size={22} />
                 )}
@@ -43,6 +47,7 @@ export default function Faculty() {
           ))}
         </div>
       )}
+      </Section>
     </div>
   );
 }

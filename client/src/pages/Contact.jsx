@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { MapPin, Phone, Mail, Clock, CheckCircle2 } from 'lucide-react';
 import { submitContactForm } from '../api/client';
+import { useSettings } from '../context/SettingsContext';
+import { Section } from '../components/Visibility';
 
 const PROGRAMS = ['BSc. CSIT', 'BCA' , 'General Inquiry'];
 
 export default function Contact() {
+  const { settings } = useSettings();
   const [form, setForm] = useState({ name: '', email: '', phone: '', program: PROGRAMS[0], message: '' });
   const [status, setStatus] = useState('idle'); // idle | sending | sent
 
@@ -19,6 +22,7 @@ export default function Contact() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
+      <Section page="contact" section="hero">
       <p className="font-mono text-xs tracking-[0.2em] text-teal-600 dark:text-teal-400 uppercase mb-2">
         Admissions
       </p>
@@ -28,13 +32,15 @@ export default function Contact() {
       <p className="text-navy-400 dark:text-navy-200 max-w-xl mb-10">
         Reach the admissions office directly, or send an inquiry and we'll respond within two working days.
       </p>
+      </Section>
 
       <div className="grid lg:grid-cols-5 gap-10">
+        <Section page="contact" section="map">
         <div className="lg:col-span-2 space-y-6">
           <div className="rounded-xl overflow-hidden border border-navy-100 dark:border-navy-700 aspect-[4/3]">
             <iframe
               title="Swastik College location"
-              src="https://maps.google.com/maps?q=Swastik%20College%2C%20Chardobato%2C%20Bhaktapur%2C%20Nepal&t=&z=14&ie=UTF8&iwloc=&output=embed"
+              src={settings.mapEmbedUrl || "https://maps.google.com/maps?q=Swastik%20College%2C%20Chardobato%2C%20Bhaktapur%2C%20Nepal&t=&z=14&ie=UTF8&iwloc=&output=embed"}
               className="w-full h-full border-0"
               loading="lazy"
             />
@@ -43,23 +49,25 @@ export default function Contact() {
           <div className="space-y-4">
             <div className="flex gap-3">
               <MapPin size={18} className="text-marigold-500 shrink-0 mt-0.5" />
-              <p className="text-sm text-navy-500 dark:text-navy-200">Chardobato, Bhaktapur, Bagmati Province, Nepal</p>
+              <p className="text-sm text-navy-500 dark:text-navy-200">{settings.address || 'Chardobato, Bhaktapur, Bagmati Province, Nepal'}</p>
             </div>
             <div className="flex gap-3">
               <Phone size={18} className="text-marigold-500 shrink-0 mt-0.5" />
-              <p className="text-sm text-navy-500 dark:text-navy-200">+977-1-4000000</p>
+              <p className="text-sm text-navy-500 dark:text-navy-200">{settings.phone || '+977-1-4000000'}</p>
             </div>
             <div className="flex gap-3">
               <Mail size={18} className="text-marigold-500 shrink-0 mt-0.5" />
-              <p className="text-sm text-navy-500 dark:text-navy-200">info.swastikcollege@gmail.com</p>
+              <p className="text-sm text-navy-500 dark:text-navy-200">{settings.email || 'info.swastikcollege@gmail.com'}</p>
             </div>
             <div className="flex gap-3">
               <Clock size={18} className="text-marigold-500 shrink-0 mt-0.5" />
-              <p className="text-sm text-navy-500 dark:text-navy-200">Sun – Fri, 6:40 AM – 11:30 AM</p>
+              <p className="text-sm text-navy-500 dark:text-navy-200">{settings.officeHours || 'Sun – Fri, 6:40 AM – 11:30 AM'}</p>
             </div>
           </div>
         </div>
+        </Section>
 
+        <Section page="contact" section="form">
         <div className="lg:col-span-3">
           {status === 'sent' ? (
             <div className="border border-teal-200 dark:border-teal-500/30 bg-teal-50 dark:bg-teal-500/10 rounded-xl p-8 text-center">
@@ -139,6 +147,7 @@ export default function Contact() {
             </form>
           )}
         </div>
+        </Section>
       </div>
     </div>
   );
