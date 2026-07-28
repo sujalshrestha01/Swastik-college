@@ -7,9 +7,11 @@ const defaultSettings = {
   tagline: 'Shaping Careers, Building Futures',
   establishedYear: '2005',
   affiliation: 'Tribhuvan University (TU)',
+  logoUrl: '',
   heroHeadline: 'Shaping Careers, Building Futures',
   heroSubheadline:
     'A TU-affiliated college offering BSc. CSIT, BCA and BBS programs, built around small classes and real project experience.',
+  heroImageUrl: '',
   heroCtaText: 'Explore Programs',
   heroCtaLink: '/programs',
   aboutSummary: '',
@@ -24,6 +26,20 @@ const defaultSettings = {
   footerNote: 'All rights reserved.',
   announcementBarText: '',
   announcementBarEnabled: false,
+  // Legacy flat toggles (kept for backward compatibility)
+  features: {
+    blogDisabled: false,
+    galleryDisabled: false,
+    heroStatusLogDisabled: false,
+  },
+  // Generic page + section visibility engine. Populated from the server, which
+  // always merges saved values on top of the full page/section catalogue —
+  // so every page/section defaults to visible even before an admin ever
+  // touches the toggle screen.
+  // Shape: { <page>: { pageEnabled: bool, sections: { <section>: bool } } }
+  visibility: {},
+  // Editable content for the About page (timeline, values, leadership quote)
+  about: { timeline: [], values: [], leadership: null },
 };
 
 const SettingsContext = createContext({ settings: defaultSettings, loading: true, refresh: () => {} });
@@ -34,7 +50,24 @@ export function SettingsProvider({ children }) {
 
   const refresh = useCallback(async () => {
     const data = await getSettings();
-    if (data) setSettings({ ...defaultSettings, ...data });
+    if (data) {
+      setSettings({
+        ...defaultSettings,
+        ...data,
+        features: {
+          ...defaultSettings.features,
+          ...(data.features || {}),
+        },
+        visibility: {
+          ...defaultSettings.visibility,
+          ...(data.visibility || {}),
+        },
+        about: {
+          ...defaultSettings.about,
+          ...(data.about || {}),
+        },
+      });
+    }
     setLoading(false);
   }, []);
 
@@ -42,8 +75,22 @@ export function SettingsProvider({ children }) {
     refresh();
   }, [refresh]);
 
+  // Is an entire page enabled? Defaults to true if not yet configured.
+  function isPageEnabled(page) {
+    const p = settings.visibility?.[page];
+    return p ? p.pageEnabled !== false : true;
+  }
+
+  // Is a specific section within a page enabled? Defaults to true.
+  function isSectionVisible(page, section) {
+    if (!isPageEnabled(page)) return false;
+    const p = settings.visibility?.[page];
+    if (!p || !p.sections || typeof p.sections[section] !== 'boolean') return true;
+    return p.sections[section];
+  }
+
   return (
-    <SettingsContext.Provider value={{ settings, loading, refresh }}>
+    <SettingsContext.Provider value={{ settings, loading, refresh, isPageEnabled, isSectionVisible }}>
       {children}
     </SettingsContext.Provider>
   );
