@@ -53,3 +53,28 @@ body {
 .animate-ticker {
   animation: ticker 28s linear infinite;
 }
+
+
+/* Force thin scrollbar styling globally for WebKit browsers (Chrome, Edge, Safari) */
+nav::-webkit-scrollbar {
+  width: 5px !important;
+}
+
+nav::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-radius: 9999px !important;
+}
+
+nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Firefox */
+nav {
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent !important;
+}
