@@ -77,7 +77,7 @@ export default function Downloads() {
             return (
               <div
                 key={d._id}
-                className="flex flex-col justify-between p-2.5 rounded-lg border border-transparent hover:border-[#D9383A] dark:hover:border-[#3B82F6] bg-white dark:bg-navy-800 shadow-xs hover:shadow-md transition-all group overflow-hidden"
+                className="flex flex-col justify-between p-2.5 rounded-lg border border-transparent hover:border-b-[#D9383A] border-b-2 dark:hover:border-b-[#3B82F6] bg-white dark:bg-navy-800 shadow-xs hover:shadow-md transition-all group overflow-hidden"
               >
                 {/* Large Preview Area (~Half the card size) */}
                 <div className="w-full h-32 flex items-center justify-center overflow-hidden rounded-md bg-navy-50/60 dark:bg-navy-900/60 mb-2">
