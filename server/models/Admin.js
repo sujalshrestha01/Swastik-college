@@ -5,8 +5,13 @@ const adminSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, trim: true, lowercase: true },
-    password: { type: String, required: true },
-    role: { type: String, enum: ['superadmin', 'editor'], default: 'superadmin' },
+    // Not required at creation time — an invited admin has no password
+    // until they accept the invite and set one.
+    password: { type: String, required: false },
+    role: { type: String, enum: ['superadmin', 'editor'], default: 'editor' },
+    status: { type: String, enum: ['pending', 'active'], default: 'active' },
+    inviteToken: { type: String, select: false },
+    inviteTokenExpires: { type: Date, select: false },
   },
   { timestamps: true }
 );
