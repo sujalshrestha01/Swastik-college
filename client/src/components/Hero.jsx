@@ -1,17 +1,22 @@
 import { Link } from 'react-router-dom';
 import { ArrowUpRight } from 'lucide-react';
 import { useSettings } from '../context/SettingsContext';
+import { resolveImageUrl } from '../api/client';
+import img1 from '../../assets/img1.jpg';
 
 export default function Hero() {
   const { settings } = useSettings();
+  const heroImage = settings.heroImageUrl ? resolveImageUrl(settings.heroImageUrl) : img1;
 
   return (
     <section className="relative overflow-hidden bg-navy-900 text-paper">
       <div
-        className="absolute inset-0 opacity-[0.15]"
-        style={{
-          backgroundImage: 'radial-gradient(circle at 1px 1px, #E8A33D 1px, transparent 0)',
-          backgroundSize: '22px 22px',
+        className="absolute inset-0 opacity-[0.4]"
+        style={{backgroundImage: `url(${heroImage})`,
+        backgroundPosition: 'center center'
+        
+          // backgroundImage: 'radial-gradient(circle at 1px 1px, #E8A33D 1px, transparent 0)',
+          // backgroundSize: '22px 22px',
         }}
         aria-hidden
       />
@@ -29,14 +34,14 @@ export default function Hero() {
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <Link
               to="/contact"
-              className="inline-flex items-center gap-2 bg-marigold hover:bg-marigold-500 text-navy-900 font-semibold px-6 py-3 rounded-full transition-colors"
+              className="inline-flex items-center gap-2 bg-marigold-500 hover:bg-marigold-600 text-navy-900 font-semibold px-6 py-3 rounded-full transition-colors"
             >
               Apply for Admission
               <ArrowUpRight size={18} />
             </Link>
             <Link
               to={settings.heroCtaLink || '/programs'}
-              className="inline-flex items-center gap-2 border border-navy-500 hover:border-marigold-300 text-paper px-6 py-3 rounded-full transition-colors text-sm font-medium"
+              className="inline-flex items-center gap-2 border border-navy-500 hover:border-marigold-500 text-paper px-6 py-3 rounded-full transition-colors text-sm font-medium"
             >
               {settings.heroCtaText || 'Explore Programs'}
             </Link>
@@ -48,7 +53,7 @@ export default function Hero() {
             <span className="w-2.5 h-2.5 rounded-full bg-marigold-300/70" />
             <span className="w-2.5 h-2.5 rounded-full bg-teal-400/70" />
             <span className="w-2.5 h-2.5 rounded-full bg-navy-300/70" />
-            <span className="ml-3 text-navy-300">campus_status.log</span>
+            <span className="ml-3 text-navy-300">college_status.log</span>
           </div>
           <ul className="space-y-2.5 text-navy-100">
             <li className="flex justify-between"><span className="text-navy-400">college</span><span>{settings.collegeShortName}</span></li>
