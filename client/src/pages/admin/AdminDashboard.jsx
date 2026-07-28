@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, Bell, Users, CalendarDays, Mail, Images } from 'lucide-react';
 import {
-  getCourses, getFaculty, getEvents, messagesAdmin, noticesAdmin, getGallery,
+  getCourses, getFaculty, getEvents, messagesAdmin, noticesAdmin, getGalleryEvents,
 } from '../../api/client';
-import { Card } from '../../components/admin/ui';
+import { Card } from '../../components/admin/Ui';
 
 const cards = [
   { key: 'courses', label: 'Courses', icon: BookOpen, to: '/admin/courses', color: 'text-teal-500 bg-teal-50' },
@@ -26,7 +26,7 @@ export default function AdminDashboard() {
         noticesAdmin.list(),
         getFaculty(),
         getEvents(),
-        getGallery(),
+        getGalleryEvents(),
         messagesAdmin.list().catch(() => []),
       ]);
       setCounts({

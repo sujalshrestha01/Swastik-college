@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Trash2, Mail, MailOpen } from 'lucide-react';
 import { messagesAdmin } from '../../api/client';
-import { Card, IconButton, EmptyState } from '../../components/admin/ui';
+import { Card, IconButton, EmptyState } from '../../components/admin/Ui';
 
 export default function AdminMessages() {
   const [items, setItems] = useState([]);

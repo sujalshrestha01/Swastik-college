@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Plus, Trash2, Pencil, X, Save } from 'lucide-react';
 import { testimonialsAdmin } from '../../api/client';
-import { Card, Field, Input, Textarea, Button, IconButton, Banner, EmptyState } from '../../components/admin/ui';
+import { Card, Field, Input, Textarea, Button, IconButton, Banner, EmptyState } from '../../components/admin/Ui';
+import ImageUpload from '../../components/admin/ImageUpload';
 
 const empty = () => ({ name: '', role: '', quote: '', photoUrl: '', order: 0 });
 
@@ -57,7 +58,7 @@ export default function AdminTestimonials() {
             <Field label="Name"><Input value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} /></Field>
             <Field label="Role / batch" hint="e.g. BSc. CSIT, Batch 2022"><Input value={editing.role} onChange={(e) => setEditing({ ...editing, role: e.target.value })} /></Field>
             <Field label="Quote"><Textarea rows={3} value={editing.quote} onChange={(e) => setEditing({ ...editing, quote: e.target.value })} /></Field>
-            <Field label="Photo URL"><Input value={editing.photoUrl} onChange={(e) => setEditing({ ...editing, photoUrl: e.target.value })} /></Field>
+            <Field label="Photo"><ImageUpload value={editing.photoUrl} onChange={(url) => setEditing({ ...editing, photoUrl: url })} shape="circle" /></Field>
             <Field label="Display order"><Input type="number" value={editing.order} onChange={(e) => setEditing({ ...editing, order: Number(e.target.value) })} /></Field>
           </div>
         </Card>

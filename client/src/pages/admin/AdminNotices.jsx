@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Plus, Trash2, Pencil, X, Save } from 'lucide-react';
 import { noticesAdmin } from '../../api/client';
-import { Card, Field, Input, Textarea, Select, Button, IconButton, Banner, EmptyState } from '../../components/admin/ui';
+import { Card, Field, Input, Textarea, Select, Button, IconButton, Banner, EmptyState } from '../../components/admin/Ui';
+import FileUpload from '../../components/admin/FileUpload';
 
 const categories = ['Exams', 'Admissions', 'Events', 'General'];
 const empty = () => ({ title: '', category: 'General', date: new Date().toISOString().slice(0, 10), excerpt: '', fileUrl: '' });
@@ -71,8 +72,8 @@ export default function AdminNotices() {
             <Field label="Excerpt / summary">
               <Textarea rows={3} value={editing.excerpt} onChange={(e) => setEditing({ ...editing, excerpt: e.target.value })} />
             </Field>
-            <Field label="Attached file URL" hint="Link to a PDF or document, if any">
-              <Input value={editing.fileUrl} onChange={(e) => setEditing({ ...editing, fileUrl: e.target.value })} />
+            <Field label="Attached file" hint="Upload a PDF or image, if any — visitors will be able to download it">
+              <FileUpload value={editing.fileUrl} onChange={(url) => setEditing({ ...editing, fileUrl: url })} />
             </Field>
           </div>
         </Card>

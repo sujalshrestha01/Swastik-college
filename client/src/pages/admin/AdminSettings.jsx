@@ -1,8 +1,99 @@
 import { useEffect, useState } from 'react';
-import { Save, Plus, Trash2, Link as LinkIcon } from 'lucide-react';
-import { getSettings, updateSettings } from '../../api/client';
-import { Card, Field, Input, Textarea, Button, IconButton, Banner } from '../../components/admin/ui';
+import { Save, Plus, Trash2, Link as LinkIcon, ToggleLeft, UserPlus, Copy, Check, Eye, GraduationCap, Users, Lightbulb, HeartHandshake, Trophy, Target, Compass, BookOpenCheck, FileDown } from 'lucide-react';
+import { Link as RouterLink } from 'react-router-dom';
+import { getSettings, updateSettings, inviteAdmin } from '../../api/client';
+import { Card, Field, Input, Select, Button, IconButton, Banner, Textarea } from '../../components/admin/Ui';
+import ImageUpload from '../../components/admin/ImageUpload';
 import { useSettings } from '../../context/SettingsContext';
+import { useAuth } from '../../context/AuthContext';
+
+const ICON_OPTIONS = ['GraduationCap', 'Users', 'Lightbulb', 'HeartHandshake', 'Trophy', 'Target', 'Compass', 'BookOpenCheck'];
+const COLOR_OPTIONS = ['blue', 'emerald', 'amber', 'rose'];
+
+function InviteAdminPanel() {
+  const { admin } = useAuth();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [role, setRole] = useState('editor');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [inviteLink, setInviteLink] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  if (admin?.role !== 'superadmin') return null;
+
+  async function handleInvite(e) {
+    e.preventDefault();
+    setError('');
+    setInviteLink('');
+    setLoading(true);
+    try {
+      const { inviteLink } = await inviteAdmin({ name, email, role });
+      setInviteLink(inviteLink);
+      setName('');
+      setEmail('');
+      setRole('editor');
+    } catch (err) {
+      setError(err.message || 'Failed to create invite');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function copyLink() {
+    navigator.clipboard.writeText(inviteLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }
+
+  return (
+    <Card
+      title="Invite a new admin"
+      description="Only superadmins can invite new admin accounts — there is no public sign-up"
+    >
+      <form onSubmit={handleInvite} className="space-y-4">
+        {error && <Banner type="error">{error}</Banner>}
+        {inviteLink && (
+          <Banner type="success">
+            <div className="flex items-center justify-between gap-3">
+              <span className="break-all">{inviteLink}</span>
+              <Button type="button" variant="secondary" onClick={copyLink}>
+                {copied ? <Check size={16} /> : <Copy size={16} />}
+                {copied ? 'Copied' : 'Copy'}
+              </Button>
+            </div>
+            <p className="text-xs mt-1 opacity-80">
+              In production this link is emailed automatically. Expires in 48 hours.
+            </p>
+          </Banner>
+        )}
+        <div className="grid md:grid-cols-3 gap-4">
+          <Field label="Name">
+            <Input required value={name} onChange={(e) => setName(e.target.value)} placeholder="Jane Doe" />
+          </Field>
+          <Field label="Email">
+            <Input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="jane@swastikcollege.edu.np"
+            />
+          </Field>
+          <Field label="Role">
+            <Select value={role} onChange={(e) => setRole(e.target.value)}>
+              <option value="editor">Editor</option>
+              <option value="superadmin">Superadmin</option>
+            </Select>
+          </Field>
+        </div>
+        <Button type="submit" disabled={loading}>
+          <UserPlus size={16} /> {loading ? 'Sending invite…' : 'Send Invite'}
+        </Button>
+      </form>
+    </Card>
+  );
+}
 
 export default function AdminSettings() {
   const { refresh } = useSettings();
@@ -21,9 +112,21 @@ export default function AdminSettings() {
   function set(key, value) {
     setSettings((prev) => ({ ...prev, [key]: value }));
   }
+
+  function setFeature(key, value) {
+    setSettings((prev) => ({
+      ...prev,
+      features: {
+        ...(prev.features || {}),
+        [key]: value,
+      },
+    }));
+  }
+
   function setSocial(key, value) {
     setSettings((prev) => ({ ...prev, socialLinks: { ...prev.socialLinks, [key]: value } }));
   }
+
   function setStat(idx, key, value) {
     setSettings((prev) => {
       const stats = [...prev.stats];
@@ -31,11 +134,37 @@ export default function AdminSettings() {
       return { ...prev, stats };
     });
   }
+
   function addStat() {
     setSettings((prev) => ({ ...prev, stats: [...(prev.stats || []), { label: '', value: 0, suffix: '' }] }));
   }
+
   function removeStat(idx) {
     setSettings((prev) => ({ ...prev, stats: prev.stats.filter((_, i) => i !== idx) }));
+  }
+
+  // ---- About page content (timeline / values / leadership quote) ----
+  function setAboutField(section, idx, key, value) {
+    setSettings((prev) => {
+      const list = [...(prev.about?.[section] || [])];
+      list[idx] = { ...list[idx], [key]: value };
+      return { ...prev, about: { ...prev.about, [section]: list } };
+    });
+  }
+  function addAboutItem(section, empty) {
+    setSettings((prev) => ({
+      ...prev,
+      about: { ...prev.about, [section]: [...(prev.about?.[section] || []), empty] },
+    }));
+  }
+  function removeAboutItem(section, idx) {
+    setSettings((prev) => ({
+      ...prev,
+      about: { ...prev.about, [section]: (prev.about?.[section] || []).filter((_, i) => i !== idx) },
+    }));
+  }
+  function setLeadership(key, value) {
+    setSettings((prev) => ({ ...prev, about: { ...prev.about, leadership: { ...prev.about?.leadership, [key]: value } } }));
   }
 
   async function handleSave() {
@@ -57,7 +186,7 @@ export default function AdminSettings() {
 
   return (
     <div className="space-y-6 max-w-3xl">
-      <div className="flex items-center justify-between sticky top-0 bg-paper z-10 py-2">
+      <div className="flex items-center justify-between sticky -top-10 bg-paper z-10 py-2">
         <div>
           <h1 className="font-display text-2xl text-navy-800">Site Settings</h1>
           <p className="text-sm text-navy-500 mt-1">Every small detail — social links, contact info, homepage content, footer.</p>
@@ -73,7 +202,7 @@ export default function AdminSettings() {
           <Field label="Short name" hint="Used in compact spaces like the navbar"><Input value={settings.collegeShortName} onChange={(e) => set('collegeShortName', e.target.value)} /></Field>
           <Field label="Established year"><Input value={settings.establishedYear} onChange={(e) => set('establishedYear', e.target.value)} /></Field>
           <Field label="Affiliation"><Input value={settings.affiliation} onChange={(e) => set('affiliation', e.target.value)} /></Field>
-          <Field label="Logo URL"><Input value={settings.logoUrl} onChange={(e) => set('logoUrl', e.target.value)} /></Field>
+          <Field label="Logo"><ImageUpload value={settings.logoUrl} onChange={(url) => set('logoUrl', url)} shape="square" /></Field>
         </div>
       </Card>
 
@@ -85,7 +214,7 @@ export default function AdminSettings() {
             <Field label="Call-to-action text"><Input value={settings.heroCtaText} onChange={(e) => set('heroCtaText', e.target.value)} /></Field>
             <Field label="Call-to-action link"><Input value={settings.heroCtaLink} onChange={(e) => set('heroCtaLink', e.target.value)} /></Field>
           </div>
-          <Field label="Hero image URL"><Input value={settings.heroImageUrl} onChange={(e) => set('heroImageUrl', e.target.value)} /></Field>
+          <Field label="Hero image"><ImageUpload value={settings.heroImageUrl} onChange={(url) => set('heroImageUrl', url)} /></Field>
         </div>
       </Card>
 
@@ -94,6 +223,59 @@ export default function AdminSettings() {
           <Field label="About summary"><Textarea rows={3} value={settings.aboutSummary} onChange={(e) => set('aboutSummary', e.target.value)} /></Field>
           <Field label="Mission statement"><Textarea rows={2} value={settings.missionStatement} onChange={(e) => set('missionStatement', e.target.value)} /></Field>
           <Field label="Vision statement"><Textarea rows={2} value={settings.visionStatement} onChange={(e) => set('visionStatement', e.target.value)} /></Field>
+        </div>
+      </Card>
+
+      <Card
+        title="About page — Our Journey timeline"
+        description="Shown as the milestone timeline on the About page"
+        action={<Button variant="secondary" onClick={() => addAboutItem('timeline', { year: '', title: '', description: '' })}><Plus size={16} /> Add milestone</Button>}
+      >
+        <div className="space-y-3">
+          {(settings.about?.timeline || []).map((item, i) => (
+            <div key={i} className="grid md:grid-cols-[100px_1fr_36px] gap-2 items-start bg-navy-50/50 p-3 rounded-lg">
+              <Input placeholder="Year" value={item.year} onChange={(e) => setAboutField('timeline', i, 'year', e.target.value)} />
+              <div className="space-y-2">
+                <Input placeholder="Title" value={item.title} onChange={(e) => setAboutField('timeline', i, 'title', e.target.value)} />
+                <Textarea rows={2} placeholder="Description" value={item.description} onChange={(e) => setAboutField('timeline', i, 'description', e.target.value)} />
+              </div>
+              <IconButton variant="danger" onClick={() => removeAboutItem('timeline', i)}><Trash2 size={16} /></IconButton>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      <Card
+        title="About page — Core Values"
+        description="Shown as the 'What Sets Us Apart' cards on the About page"
+        action={<Button variant="secondary" onClick={() => addAboutItem('values', { icon: 'GraduationCap', colorKey: 'blue', title: '', text: '' })}><Plus size={16} /> Add value</Button>}
+      >
+        <div className="space-y-3">
+          {(settings.about?.values || []).map((item, i) => (
+            <div key={i} className="grid md:grid-cols-[120px_100px_1fr_36px] gap-2 items-start bg-navy-50/50 p-3 rounded-lg">
+              <Select value={item.icon} onChange={(e) => setAboutField('values', i, 'icon', e.target.value)}>
+                {ICON_OPTIONS.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+              </Select>
+              <Select value={item.colorKey} onChange={(e) => setAboutField('values', i, 'colorKey', e.target.value)}>
+                {COLOR_OPTIONS.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+              </Select>
+              <div className="space-y-2">
+                <Input placeholder="Title" value={item.title} onChange={(e) => setAboutField('values', i, 'title', e.target.value)} />
+                <Textarea rows={2} placeholder="Description" value={item.text} onChange={(e) => setAboutField('values', i, 'text', e.target.value)} />
+              </div>
+              <IconButton variant="danger" onClick={() => removeAboutItem('values', i)}><Trash2 size={16} /></IconButton>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      <Card title="About page — Leadership quote" description="The featured quote block on the About page">
+        <div className="space-y-4">
+          <Field label="Quote"><Textarea rows={3} value={settings.about?.leadership?.text || ''} onChange={(e) => setLeadership('text', e.target.value)} /></Field>
+          <div className="grid md:grid-cols-2 gap-4">
+            <Field label="Author name"><Input value={settings.about?.leadership?.author || ''} onChange={(e) => setLeadership('author', e.target.value)} /></Field>
+            <Field label="Author role"><Input value={settings.about?.leadership?.role || ''} onChange={(e) => setLeadership('role', e.target.value)} /></Field>
+          </div>
         </div>
       </Card>
 
@@ -143,6 +325,50 @@ export default function AdminSettings() {
         </div>
       </Card>
 
+      <Card
+        title="Navbar Downloads"
+        description="The navbar's Downloads dropdown (Model Questions, Past Questions, etc.) is now managed on its own page."
+        action={
+          <RouterLink to="/admin/downloads">
+            <Button variant="secondary"><FileDown size={16} /> Manage Downloads</Button>
+          </RouterLink>
+        }
+      >
+        <p className="text-xs text-navy-400">
+          Add, edit, or remove as many downloadable files as you like — each with its own title and category.
+        </p>
+      </Card>
+
+      {/* Component Toggles Section */}
+      <Card
+        title="Component Toggles"
+        description="Control the visibility of specific pages and sections across the site"
+        action={
+          <RouterLink to="/admin/visibility">
+            <Button variant="secondary"><Eye size={16} /> Open full Visibility manager</Button>
+          </RouterLink>
+        }
+      >
+        <div className="space-y-3">
+          <label className="flex items-center gap-2 cursor-pointer p-2 bg-navy-50/50 dark:bg-navy-800/30 rounded-lg">
+            <input
+              type="checkbox"
+              checked={settings.features?.blogDisabled || false}
+              onChange={(e) => setFeature('blogDisabled', e.target.checked)}
+              className="rounded text-marigold focus:ring-marigold"
+            />
+            <div>
+              <span className="text-sm font-medium text-navy-800 dark:text-paper">Disable Blog Module</span>
+              <p className="text-xs text-navy-500">When checked, hides the Blog link from the navbar and disables the blog section.</p>
+            </div>
+          </label>
+          <p className="text-xs text-navy-400 px-2">
+            For fine-grained control over every page and section (hero banners, timelines, individual blocks), use the{' '}
+            <RouterLink to="/admin/visibility" className="text-marigold-600 font-semibold hover:underline">Page &amp; Section Visibility</RouterLink> manager.
+          </p>
+        </div>
+      </Card>
+
       <Card title="Announcement bar">
         <div className="space-y-3">
           <label className="flex items-center gap-2">
@@ -156,6 +382,8 @@ export default function AdminSettings() {
       <Card title="Footer">
         <Field label="Footer note"><Input value={settings.footerNote} onChange={(e) => set('footerNote', e.target.value)} /></Field>
       </Card>
+
+      <InviteAdminPanel />
 
       <div className="flex justify-end pb-6">
         <Button onClick={handleSave} disabled={saving}><Save size={16} /> {saving ? 'Saving…' : 'Save All Changes'}</Button>

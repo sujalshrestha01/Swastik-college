@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Plus, Trash2, Pencil, X, Save } from 'lucide-react';
-import { facultyAdmin } from '../../api/client';
-import { Card, Field, Input, Textarea, Button, IconButton, Banner, EmptyState } from '../../components/admin/ui';
+import { facultyAdmin, resolveImageUrl } from '../../api/client';
+import { Card, Field, Input, Textarea, Button, IconButton, Banner, EmptyState } from '../../components/admin/Ui';
+import ImageUpload from '../../components/admin/ImageUpload';
 
 const empty = () => ({ name: '', designation: '', department: '', qualification: '', bio: '', photoUrl: '', email: '', order: 0 });
 
@@ -53,13 +54,20 @@ export default function AdminFaculty() {
         </div>
         {error && <Banner type="error">{error}</Banner>}
         <Card>
+          <Field label="Photo" className="mb-4">
+            <ImageUpload
+              value={editing.photoUrl}
+              onChange={(url) => setEditing({ ...editing, photoUrl: url })}
+              shape="circle"
+              hint="Square headshot works best"
+            />
+          </Field>
           <div className="grid md:grid-cols-2 gap-4">
             <Field label="Full name"><Input value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} /></Field>
             <Field label="Designation"><Input value={editing.designation} onChange={(e) => setEditing({ ...editing, designation: e.target.value })} placeholder="Head of Department" /></Field>
             <Field label="Department"><Input value={editing.department} onChange={(e) => setEditing({ ...editing, department: e.target.value })} /></Field>
             <Field label="Qualification"><Input value={editing.qualification} onChange={(e) => setEditing({ ...editing, qualification: e.target.value })} /></Field>
             <Field label="Email"><Input value={editing.email} onChange={(e) => setEditing({ ...editing, email: e.target.value })} /></Field>
-            <Field label="Photo URL"><Input value={editing.photoUrl} onChange={(e) => setEditing({ ...editing, photoUrl: e.target.value })} /></Field>
             <Field label="Display order"><Input type="number" value={editing.order} onChange={(e) => setEditing({ ...editing, order: Number(e.target.value) })} /></Field>
           </div>
           <Field label="Short bio" className="mt-4">
@@ -83,11 +91,18 @@ export default function AdminFaculty() {
           {items.map((f) => (
             <Card key={f._id}>
               <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h3 className="font-display text-navy-800">{f.name}</h3>
-                  <p className="text-sm text-marigold-600">{f.designation}</p>
-                  <p className="text-xs text-navy-400">{f.department} · {f.qualification}</p>
-                  {f.bio && <p className="text-sm text-navy-500 mt-1">{f.bio}</p>}
+                <div className="flex items-start gap-3 min-w-0">
+                  {f.photoUrl ? (
+                    <img src={resolveImageUrl(f.photoUrl)} alt="" className="w-12 h-12 rounded-full object-cover shrink-0" />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-navy-100 shrink-0" />
+                  )}
+                  <div className="min-w-0">
+                    <h3 className="font-display text-navy-800">{f.name}</h3>
+                    <p className="text-sm text-marigold-600">{f.designation}</p>
+                    <p className="text-xs text-navy-400">{f.department} · {f.qualification}</p>
+                    {f.bio && <p className="text-sm text-navy-500 mt-1">{f.bio}</p>}
+                  </div>
                 </div>
                 <div className="flex gap-2 shrink-0">
                   <IconButton onClick={() => { setEditing(f); setIsNew(false); }}><Pencil size={16} /></IconButton>

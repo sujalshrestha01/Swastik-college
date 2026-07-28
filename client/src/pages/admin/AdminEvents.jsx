@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Plus, Trash2, Pencil, X, Save } from 'lucide-react';
-import { eventsAdmin } from '../../api/client';
-import { Card, Field, Input, Textarea, Select, Button, IconButton, Banner, EmptyState } from '../../components/admin/ui';
+import { eventsAdmin, resolveImageUrl } from '../../api/client';
+import { Card, Field, Input, Textarea, Select, Button, IconButton, Banner, EmptyState } from '../../components/admin/Ui';
+import ImageUpload from '../../components/admin/ImageUpload';
 
 const types = ['Event', 'Workshop', 'Seminar', 'Fest', 'Other'];
 const empty = () => ({
-  title: '', description: '', date: new Date().toISOString().slice(0, 16), location: 'Main Campus', type: 'Event', isFeatured: false,
+  title: '', description: '', date: new Date().toISOString().slice(0, 16), location: 'Main Campus', type: 'Event', isFeatured: false, imageUrl: '',
 });
 
 export default function AdminEvents() {
@@ -57,6 +58,9 @@ export default function AdminEvents() {
         {error && <Banner type="error">{error}</Banner>}
         <Card>
           <div className="space-y-4">
+            <Field label="Event image">
+              <ImageUpload value={editing.imageUrl} onChange={(url) => setEditing({ ...editing, imageUrl: url })} />
+            </Field>
             <Field label="Title"><Input value={editing.title} onChange={(e) => setEditing({ ...editing, title: e.target.value })} /></Field>
             <div className="grid grid-cols-2 gap-4">
               <Field label="Date & time">
@@ -93,13 +97,18 @@ export default function AdminEvents() {
           {items.map((ev) => (
             <Card key={ev._id}>
               <div className="flex items-start justify-between gap-4">
-                <div>
+                <div className="flex items-start gap-3 min-w-0">
+                  {ev.imageUrl && (
+                    <img src={resolveImageUrl(ev.imageUrl)} alt="" className="w-16 h-16 rounded-lg object-cover shrink-0" />
+                  )}
+                  <div>
                   <div className="flex items-center gap-2">
                     <h3 className="font-display text-navy-800">{ev.title}</h3>
                     {ev.isFeatured && <span className="text-xs bg-marigold-100 text-marigold-600 px-2 py-0.5 rounded-full">Featured</span>}
                   </div>
                   <p className="text-xs text-navy-400 mt-1">{new Date(ev.date).toLocaleString()} · {ev.location} · {ev.type}</p>
                   {ev.description && <p className="text-sm text-navy-500 mt-1">{ev.description}</p>}
+                  </div>
                 </div>
                 <div className="flex gap-2 shrink-0">
                   <IconButton onClick={() => { setEditing(ev); setIsNew(false); }}><Pencil size={16} /></IconButton>

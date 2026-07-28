@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { Field, Input, Button, Banner } from '../../components/admin/ui';
+import { Field, Input, Button, Banner } from '../../components/admin/Ui';
 
 export default function AdminLogin() {
   const { login, isAuthenticated } = useAuth();

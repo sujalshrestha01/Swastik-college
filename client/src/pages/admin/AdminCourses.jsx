@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Plus, Trash2, Pencil, X, Save, ChevronDown, ChevronUp } from 'lucide-react';
 import { coursesAdmin } from '../../api/client';
-import { Card, Field, Input, Textarea, Button, IconButton, Banner, EmptyState } from '../../components/admin/ui';
+import { Card, Field, Input, Textarea, Button, IconButton, Banner, EmptyState } from '../../components/admin/Ui';
 
 const emptyCourse = () => ({
   slug: '',
