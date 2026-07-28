@@ -13,7 +13,7 @@ export default function Faculty() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
       <Section page="faculty" section="hero">
-      <p className="font-mono text-xs tracking-[0.2em] text-teal-600 dark:text-teal-400 uppercase mb-2">Our People</p>
+      <p className="font-mono text-xs tracking-[0.2em] text-[#D9383A] dark:text-[#3B82F6] uppercase mb-2">Our People</p>
       <h1 className="font-display text-3xl sm:text-4xl font-medium text-navy dark:text-paper mb-3">Faculty & Staff</h1>
       <p className="text-navy-400 dark:text-navy-200 max-w-2xl mb-10">
         Meet the educators and administrators guiding students through their academic journey.

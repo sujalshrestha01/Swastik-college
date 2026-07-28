@@ -59,8 +59,8 @@ export default function Gallery() {
         {/* Header */}
         <Section page="gallery" section="hero">
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="font-mono text-xs tracking-[0.2em] text-[#D9383A] font-semibold uppercase">
-            Campus Life &amp; Events
+          <span className="font-mono text-xs tracking-[0.2em] text-[#D9383A] dark:text-[#3B82F6] font-semibold uppercase">
+            College Life &amp; Events
           </span>
           <h1 className="font-display text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mt-2">
             College Photo Gallery

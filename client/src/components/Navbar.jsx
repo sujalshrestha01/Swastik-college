@@ -39,7 +39,10 @@ export default function Navbar() {
         <Link
           to="/"
           className="flex items-center gap-2 shrink-0"
-          onClick={() => setOpen(false)}
+          onClick={() => {
+            setOpen(false);
+            window.location.reload();
+          }}
         >
           <img
             src={settings?.logoUrl ? resolveImageUrl(settings.logoUrl) : logo}
@@ -59,7 +62,6 @@ export default function Navbar() {
             className="h-8 sm:h-9 lg:h-10 w-auto object-contain transition-all dark:brightness-105 dark:drop-shadow-[0_0_16px_rgba(255,255,255,0.6)]"
           />
         </Link> */}
-
 
         {/* Desktop Navigation Links */}
         <div className="hidden md:flex items-center gap-3 lg:gap-6 xl:gap-8 min-w-0">
