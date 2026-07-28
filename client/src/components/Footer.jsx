@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { MapPin, Phone, Mail, Hexagon, ShieldCheck } from 'lucide-react';
 import { useSettings } from '../context/SettingsContext';
+import { resolveImageUrl } from '../api/client';
 import logo from '../../assets/swastik-logo.png';
 
 function Facebook(props) {
@@ -45,7 +46,7 @@ function Twitter(props) {
 }
 
 export default function Footer() {
-  const { settings } = useSettings();
+  const { settings, isPageEnabled } = useSettings();
   const social = settings.socialLinks || {};
   const socialLinks = [
     { key: 'facebook', Icon: Facebook, url: social.facebook },
@@ -55,6 +56,14 @@ export default function Footer() {
     { key: 'twitter', Icon: Twitter, url: social.twitter },
   ].filter((s) => s.url);
 
+  const exploreLinks = [
+    { to: '/programs', label: 'Academic Programs', page: 'programs' },
+    { to: '/notices', label: 'Notice Board', page: 'notices' },
+    { to: '/about', label: 'About Us', page: 'about' },
+    { to: '/faculty', label: 'Faculty', page: 'faculty' },
+    { to: '/contact', label: 'Contact Us', page: 'contact' },
+  ].filter((l) => isPageEnabled(l.page));
+
   return (
     <footer className="bg-navy-900 text-navy-200 pt-16 pb-8 mt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -62,7 +71,7 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-2 mb-4">
               {/* <Hexagon className="text-marigold" size={22} fill="#1B2A4A" /> */}
-              <img src={logo} alt="Logo" className="h-10" />
+              <img src={settings.logoUrl ? resolveImageUrl(settings.logoUrl) : logo} alt="Logo" className="h-10" />
               {/* <span className="font-display text-lg text-paper">{settings.collegeName}</span> */}
             </div>
             <p className="text-sm leading-relaxed">
@@ -82,11 +91,9 @@ export default function Footer() {
           <div>
             <h4 className="text-paper font-medium text-sm mb-4">Explore</h4>
             <ul className="space-y-2.5 text-sm">
-              <li><Link to="/programs" className="hover:text-marigold-300 transition-colors">Academic Programs</Link></li>
-              <li><Link to="/notices" className="hover:text-marigold-300 transition-colors">Notice Board</Link></li>
-              <li><Link to="/about" className="hover:text-marigold-300 transition-colors">About Us</Link></li>
-              <li><Link to="/faculty" className="hover:text-marigold-300 transition-colors">Faculty</Link></li>
-              <li><Link to="/contact" className="hover:text-marigold-300 transition-colors">Contact Us</Link></li>
+              {exploreLinks.map((l) => (
+                <li key={l.to}><Link to={l.to} className="hover:text-marigold-300 transition-colors">{l.label}</Link></li>
+              ))}
             </ul>
           </div>
 
