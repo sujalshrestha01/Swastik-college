@@ -8,7 +8,11 @@ import SiteSettings from '../models/SiteSettings.js';
 import Faculty from '../models/Faculty.js';
 import Event from '../models/Event.js';
 import Testimonial from '../models/Testimonial.js';
-import GalleryImage from '../models/Gallery.js';
+import GalleryEvent from '../models/Gallery.js';
+import Blog from '../models/Blog.js';
+import SkillCourse from '../models/SkillCourse.js';
+import Workshop from '../models/Workshop.js';
+import Faq from '../models/Faq.js';
 
 const notices = [
   {
@@ -291,13 +295,52 @@ async function seed() {
   await Faculty.deleteMany({});
   await Event.deleteMany({});
   await Testimonial.deleteMany({});
-  await GalleryImage.deleteMany({});
+  await GalleryEvent.deleteMany({});
+  await Blog.deleteMany({});
+  await SkillCourse.deleteMany({});
+  await Workshop.deleteMany({});
+  await Faq.deleteMany({});
 
   await Notice.insertMany(notices);
   await Course.insertMany(courses);
   await Faculty.insertMany(faculty);
   await Event.insertMany(events);
   await Testimonial.insertMany(testimonials);
+
+  await SkillCourse.insertMany([
+    { name: 'Python Programming', duration: '4 Weeks', order: 1,
+      description: 'Master Python fundamentals, object-oriented concepts, automated scripts, and working with external data APIs.' },
+    { name: 'MERN Stack Development', duration: '8 Weeks', order: 2,
+      description: 'Build scalable full-stack web applications using MongoDB, Express.js, React, and Node.js.' },
+    { name: 'Cybersecurity & Linux Essentials', duration: '5 Weeks', order: 3,
+      description: 'Gain hands-on skills with Linux terminal navigation, bash scripting, network security, and access controls.' },
+  ]);
+
+  await Workshop.insertMany([
+    { name: 'Git & GitHub Workflow', duration: '3 Days (Weekend)', startDate: new Date('2026-10-14'),
+      type: 'Hands-on Workshop', status: 'Enrollment Open', order: 1,
+      description: 'Practical deep-dive into git version control, branch management, resolving merge conflicts, and team collaboration.',
+      highlights: ['Interactive Rebase & Branching', 'Resolving Complex Merge Conflicts', 'PR Reviews & GitHub Workflows', 'CI/CD Pipeline Fundamentals'],
+      enrollUrl: '' },
+    { name: 'AWS Cloud Fundamentals', duration: '1 Day Intensive', startDate: new Date('2026-10-22'),
+      type: 'Live BootCamp', status: 'Enrollment Open', order: 2,
+      description: 'Deploy your first application on AWS. Learn EC2 provisioning, S3 bucket storage, and basic IAM role policies.',
+      highlights: ['EC2 Instance Provisioning', 'S3 Bucket Permissions & Hosting', 'IAM User Security Policies', 'Cloud Domain Configuration'],
+      enrollUrl: '' },
+  ]);
+
+  await Faq.insertMany([
+    { question: 'What programs do you offer?', order: 1,
+      answer: 'We offer TU-affiliated BSc. CSIT, BCA and BBS programs, plus non-credit certification courses and live workshops. Check the Academics page for full details.' },
+    { question: 'How do I apply for admission?', order: 2,
+      answer: "Use the Contact page's admission inquiry form, or message us here in chat, and the admissions office will follow up by email within two working days." },
+    { question: 'Where is the campus located?', order: 3,
+      answer: 'Chardobato, Bhaktapur, Bagmati Province, Nepal — see the map on our Contact page for directions.' },
+    { question: 'What are your office hours?', order: 4,
+      answer: 'Sunday to Friday, 6:40 AM to 11:30 AM.' },
+  ]);
+  // Gallery events and blog posts start empty — the admin uploads real photos
+  // and writes real posts from the admin panel (Gallery / Blog Posts screens).
 
   await SiteSettings.findOneAndUpdate({ key: 'main' }, siteSettingsData, { upsert: true, new: true });
 
