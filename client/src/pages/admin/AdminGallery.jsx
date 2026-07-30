@@ -76,9 +76,9 @@ export default function AdminGallery() {
         <Card title="Photos" description="Upload directly from your device. Click the star on a photo to make it the album's cover/thumbnail.">
           <MultiImageUpload
             images={editing.images}
-            onChange={(images) => setEditing({ ...editing, images })}
+            onChange={(images) => setEditing((prev) => ({ ...prev, images }))}
             thumbnailId={editing.thumbnailId}
-            onThumbnailChange={(id) => setEditing({ ...editing, thumbnailId: id })}
+           onThumbnailChange={(id) => setEditing((prev) => ({ ...prev, thumbnailId: id }))}
           />
         </Card>
         <Card>

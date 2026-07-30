@@ -64,7 +64,7 @@ export default function Navbar() {
         </Link> */}
 
         {/* Desktop Navigation Links */}
-        <div className="hidden md:flex items-center gap-3 lg:gap-6 xl:gap-8 min-w-0">
+        <div className="hidden lg:flex items-center gap-3 lg:gap-6 xl:gap-8 min-w-0">
           {navLinks.map((l) => (
             <NavLink
               key={l.to}
@@ -82,7 +82,7 @@ export default function Navbar() {
           ))}
         </div>
         {/* Action Controls */}
-        <div className="hidden md:flex items-center gap-2 lg:gap-3 shrink-0">
+        <div className="hidden lg:flex items-center gap-2 lg:gap-3 shrink-0">
           <button
             onClick={toggleTheme}
             aria-label="Toggle dark mode"
@@ -99,7 +99,7 @@ export default function Navbar() {
         </div>
         {/* Mobile Hamburger Toggle */}
         <button
-          className="md:hidden p-2 text-navy-700 dark:text-paper focus:outline-hidden"
+          className="lg:hidden p-2 text-navy-700 dark:text-paper focus:outline-hidden"
           onClick={() => setOpen((o) => !o)}
           aria-label="Toggle menu"
         >
@@ -109,7 +109,7 @@ export default function Navbar() {
 
       {/* Mobile Drawer Menu */}
       {open && (
-        <div className="md:hidden border-t border-navy-100 dark:border-navy-700 bg-paper dark:bg-navy-900 px-4 pb-5 pt-2 max-h-[85vh] overflow-y-auto">
+        <div className="lg:hidden border-t border-navy-100 dark:border-navy-700 bg-paper dark:bg-navy-900 px-4 pb-5 pt-2 max-h-[85vh] overflow-y-auto">
           <div className="flex flex-col gap-1">
             {navLinks.map((l) => (
               <NavLink
