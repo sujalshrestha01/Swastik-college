@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { Plus, X, MessageCircle, ClipboardEdit } from 'lucide-react';
 import ChatWithAdmissions from './ChatWithAdmissions';
 import { useSettings } from '../context/SettingsContext';

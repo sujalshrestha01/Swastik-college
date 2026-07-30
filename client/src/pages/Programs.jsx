@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { ArrowUpRight, Clock, Users, Award } from 'lucide-react';
 import { getCourses } from '../api/client';
 import { Section } from '../components/Visibility';

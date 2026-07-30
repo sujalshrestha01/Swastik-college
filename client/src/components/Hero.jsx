@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { ArrowUpRight } from 'lucide-react';
 import { useSettings } from '../context/SettingsContext';
 import { resolveImageUrl } from '../api/client';

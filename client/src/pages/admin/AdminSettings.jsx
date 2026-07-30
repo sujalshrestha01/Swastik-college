@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Save, Plus, Trash2, Link as LinkIcon, ToggleLeft, UserPlus, Copy, Check, Eye, GraduationCap, Users, Lightbulb, HeartHandshake, Trophy, Target, Compass, BookOpenCheck, FileDown } from 'lucide-react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router';
 import { getSettings, updateSettings, inviteAdmin } from '../../api/client';
 import { Card, Field, Input, Select, Button, IconButton, Banner, Textarea } from '../../components/admin/Ui';
 import ImageUpload from '../../components/admin/ImageUpload';

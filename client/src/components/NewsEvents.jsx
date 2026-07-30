@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { CalendarDays, ArrowUpRight } from 'lucide-react';
 import { getNotices, getEvents } from '../api/client';
 import { useSettings } from '../context/SettingsContext';

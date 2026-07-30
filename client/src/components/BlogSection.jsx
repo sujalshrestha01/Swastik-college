@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { ArrowRight, BookOpen } from 'lucide-react';
 import { getBlogs, resolveImageUrl } from '../api/client';
 import { useSettings } from '../context/SettingsContext';

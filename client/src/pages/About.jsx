@@ -17,7 +17,7 @@ import {
   Eye,
   ChevronRight,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { useSettings } from '../context/SettingsContext';
 import { getGalleryEvents, resolveImageUrl } from '../api/client';
 import { Section } from '../components/Visibility';

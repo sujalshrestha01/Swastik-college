@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router';
 import { ChevronDown, Download, CheckCircle2, ArrowLeft } from 'lucide-react';
 import { getCourse } from '../api/client';
 

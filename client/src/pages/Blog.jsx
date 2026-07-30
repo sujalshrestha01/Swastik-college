@@ -7,7 +7,7 @@ import {
   ArrowLeft,
   Search,
 } from "lucide-react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams } from "react-router";
 import { getBlogs, getBlog, resolveImageUrl } from "../api/client";
 import { Section } from "../components/Visibility";
 
