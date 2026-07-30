@@ -24,6 +24,21 @@ const siteSettingsSchema = new mongoose.Schema(
     heroCtaText: { type: String, default: 'Explore Programs' },
     heroCtaLink: { type: String, default: '/programs' },
 
+
+    heroStatusLog: [
+      {
+        label: { type: String, default: '' },
+        value: { type: String, default: '' },
+      },
+    ],
+    whyChooseUs: [
+      {
+        icon: { type: String, default: 'GraduationCap' },
+        title: { type: String, default: '' },
+        description: { type: String, default: '' },
+      },
+    ],
+
     aboutSummary: { type: String, default: '' },
     missionStatement: { type: String, default: '' },
     visionStatement: { type: String, default: '' },

@@ -16,6 +16,7 @@ export const VISIBILITY_SCHEMA = {
     label: 'Home',
     sections: {
       hero: 'Hero Banner',
+      heroStatusLog: 'Hero Status Log Card', 
       quickAccess: 'Quick Access Cards',
       whyChooseUs: 'Why Choose Us',
       programsOverview: 'Programs Overview',

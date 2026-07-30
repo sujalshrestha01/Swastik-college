@@ -143,6 +143,37 @@ export default function AdminSettings() {
     setSettings((prev) => ({ ...prev, stats: prev.stats.filter((_, i) => i !== idx) }));
   }
 
+
+  // Add these handler functions near your existing setStat/addStat/removeStat functions:
+
+function setHeroStatusRow(idx, key, value) {
+  setSettings((prev) => {
+    const rows = [...(prev.heroStatusLog || [])];
+    rows[idx] = { ...rows[idx], [key]: value };
+    return { ...prev, heroStatusLog: rows };
+  });
+}
+function addHeroStatusRow() {
+  setSettings((prev) => ({ ...prev, heroStatusLog: [...(prev.heroStatusLog || []), { label: '', value: '' }] }));
+}
+function removeHeroStatusRow(idx) {
+  setSettings((prev) => ({ ...prev, heroStatusLog: prev.heroStatusLog.filter((_, i) => i !== idx) }));
+}
+
+function setWhyChooseUsItem(idx, key, value) {
+  setSettings((prev) => {
+    const items = [...(prev.whyChooseUs || [])];
+    items[idx] = { ...items[idx], [key]: value };
+    return { ...prev, whyChooseUs: items };
+  });
+}
+function addWhyChooseUsItem() {
+  setSettings((prev) => ({ ...prev, whyChooseUs: [...(prev.whyChooseUs || []), { icon: 'GraduationCap', title: '', description: '' }] }));
+}
+function removeWhyChooseUsItem(idx) {
+  setSettings((prev) => ({ ...prev, whyChooseUs: prev.whyChooseUs.filter((_, i) => i !== idx) }));
+}
+
   // ---- About page content (timeline / values / leadership quote) ----
   function setAboutField(section, idx, key, value) {
     setSettings((prev) => {
@@ -218,6 +249,44 @@ export default function AdminSettings() {
         </div>
       </Card>
 
+      
+<Card
+  title="Homepage Hero status log card"
+  description="The terminal-style card shown next to the hero headline. Leave 'Value' blank on college/affiliation/contact rows to auto-fill from College Identity / Contact info above."
+  action={<Button variant="secondary" onClick={addHeroStatusRow}><Plus size={16} /> Add row</Button>}
+>
+  <div className="space-y-2">
+    {(settings.heroStatusLog || []).map((row, i) => (
+      <div key={i} className="grid grid-cols-[1fr_1fr_36px] gap-2">
+        <Input placeholder="Label (e.g. college)" value={row.label} onChange={(e) => setHeroStatusRow(i, 'label', e.target.value)} />
+        <Input placeholder="Value (optional)" value={row.value} onChange={(e) => setHeroStatusRow(i, 'value', e.target.value)} />
+        <IconButton variant="danger" onClick={() => removeHeroStatusRow(i)}><Trash2 size={16} /></IconButton>
+      </div>
+    ))}
+  </div>
+</Card>
+
+<Card
+  title="Homepage Why Choose Us cards"
+  description="The four feature cards shown on the homepage under 'Why Choose Us?'"
+  action={<Button variant="secondary" onClick={addWhyChooseUsItem}><Plus size={16} /> Add card</Button>}
+>
+  <div className="space-y-3">
+    {(settings.whyChooseUs || []).map((item, i) => (
+      <div key={i} className="grid md:grid-cols-[140px_1fr_36px] gap-2 items-start bg-navy-50/50 p-3 rounded-lg">
+        <Select value={item.icon} onChange={(e) => setWhyChooseUsItem(i, 'icon', e.target.value)}>
+          {ICON_OPTIONS.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
+        </Select>
+        <div className="space-y-2">
+          <Input placeholder="Title" value={item.title} onChange={(e) => setWhyChooseUsItem(i, 'title', e.target.value)} />
+          <Textarea rows={2} placeholder="Description" value={item.description} onChange={(e) => setWhyChooseUsItem(i, 'description', e.target.value)} />
+        </div>
+        <IconButton variant="danger" onClick={() => removeWhyChooseUsItem(i)}><Trash2 size={16} /></IconButton>
+      </div>
+    ))}
+  </div>
+</Card>
+
       <Card title="About, mission & vision">
         <div className="space-y-4">
           <Field label="About summary"><Textarea rows={3} value={settings.aboutSummary} onChange={(e) => set('aboutSummary', e.target.value)} /></Field>
@@ -291,6 +360,8 @@ export default function AdminSettings() {
           ))}
         </div>
       </Card>
+
+      
 
       <Card title="Contact information">
         <div className="grid md:grid-cols-2 gap-4">

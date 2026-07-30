@@ -14,6 +14,19 @@ const defaultSettings = {
   heroImageUrl: '',
   heroCtaText: 'Explore Programs',
   heroCtaLink: '/programs',
+
+  heroStatusLog: [
+    { label: 'college', value: '' },       // filled from collegeShortName at render if empty
+    { label: 'admissions', value: 'open' },
+    { label: 'affiliation', value: '' },   // filled from affiliation at render if empty
+    { label: 'contact', value: '' },       // filled from phone at render if empty
+  ],
+  whyChooseUs: [
+    { icon: 'GraduationCap', title: 'TU Affiliated Programs', description: 'Offering industry-aligned BCA & B.Sc. CSIT degrees with standard 4-year, 8-semester curriculum excellence.' },
+    { icon: 'Users', title: 'Industry Partnerships & 100% Placement', description: 'Direct ties with top IT & Fintech giants like F1Soft and eSewa to provide internships, workshops, and career readiness.' },
+    { icon: 'Target', title: 'Practical & Professional Training', description: 'Beyond standard theory, students gain hands-on expertise through continuous lab work, bootcamps, and real projects.' },
+    { icon: 'HeartHandshake', title: 'Experienced Faculty', description: 'Guided by seasoned educators, tech leaders, and vibrant entrepreneurs dedicated to student mentorship.' },
+  ],
   aboutSummary: '',
   missionStatement: '',
   visionStatement: '',

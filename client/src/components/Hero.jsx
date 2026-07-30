@@ -2,6 +2,7 @@ import { Link } from 'react-router';
 import { ArrowUpRight } from 'lucide-react';
 import { useSettings } from '../context/SettingsContext';
 import { resolveImageUrl } from '../api/client';
+import { Section } from './Visibility';
 import img1 from '../../assets/img1.jpg';
 
 export default function Hero() {
@@ -48,21 +49,30 @@ export default function Hero() {
           </div>
         </div>
 
-        <div className="bg-navy-800/70 border border-navy-600 rounded-2xl p-5 font-mono text-xs sm:text-sm">
-          <div className="flex items-center gap-1.5 pb-3 mb-3 border-b border-navy-600">
-            <span className="w-2.5 h-2.5 rounded-full bg-marigold-300/70" />
-            <span className="w-2.5 h-2.5 rounded-full bg-teal-400/70" />
-            <span className="w-2.5 h-2.5 rounded-full bg-navy-300/70" />
-            <span className="ml-3 text-navy-300">college_status.log</span>
-          </div>
-          <ul className="space-y-2.5 text-navy-100">
-            <li className="flex justify-between"><span className="text-navy-400">college</span><span>{settings.collegeShortName}</span></li>
-            <li className="flex justify-between"><span className="text-navy-400">admissions</span><span className="text-marigold-300">open</span></li>
-            <li className="flex justify-between"><span className="text-navy-400">affiliation</span><span>{settings.affiliation}</span></li>
-            <li className="flex justify-between"><span className="text-navy-400">contact</span><span>{settings.phone}</span></li>
-          </ul>
+       <Section page="home" section="heroStatusLog">
+      <div className="bg-navy-800/70 border border-navy-600 rounded-2xl p-5 font-mono text-xs sm:text-sm">
+        <div className="flex items-center gap-1.5 pb-3 mb-3 border-b border-navy-600">
+          <span className="w-2.5 h-2.5 rounded-full bg-marigold-300/70" />
+          <span className="w-2.5 h-2.5 rounded-full bg-teal-400/70" />
+          <span className="w-2.5 h-2.5 rounded-full bg-navy-300/70" />
+          <span className="ml-3 text-navy-300">college_status.log</span>
         </div>
+        <ul className="space-y-2.5 text-navy-100">
+          {(settings.heroStatusLog?.length ? settings.heroStatusLog : []).map((row, i) => (
+            <li key={i} className="flex justify-between">
+              <span className="text-navy-400">{row.label}</span>
+              <span className={row.label === 'admissions' ? 'text-marigold-300' : ''}>
+                {row.value || (row.label === 'college' ? settings.collegeShortName
+                  : row.label === 'affiliation' ? settings.affiliation
+                  : row.label === 'contact' ? settings.phone
+                  : '')}
+              </span>
+            </li>
+          ))}
+        </ul>
       </div>
+    </Section>
+          </div>
     </section>
   );
 }
