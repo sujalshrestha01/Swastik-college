@@ -6,6 +6,7 @@ import { Card, Field, Input, Select, Button, IconButton, Banner, Textarea } from
 import ImageUpload from '../../components/admin/ImageUpload';
 import { useSettings } from '../../context/SettingsContext';
 import { useAuth } from '../../context/AuthContext';
+import HeroCarouselUpload from '../../components/admin/HeroCarouselUpload';
 
 const ICON_OPTIONS = ['GraduationCap', 'Users', 'Lightbulb', 'HeartHandshake', 'Trophy', 'Target', 'Compass', 'BookOpenCheck'];
 const COLOR_OPTIONS = ['blue', 'emerald', 'amber', 'rose'];
@@ -246,6 +247,12 @@ function removeWhyChooseUsItem(idx) {
             <Field label="Call-to-action link"><Input value={settings.heroCtaLink} onChange={(e) => set('heroCtaLink', e.target.value)} /></Field>
           </div>
           <Field label="Hero image"><ImageUpload value={settings.heroImageUrl} onChange={(url) => set('heroImageUrl', url)} /></Field>
+          <Field label="Hero carousel images" hint="If any images are added here, the carousel replaces the single hero image above.">
+          <HeroCarouselUpload
+            images={settings.heroImages || []}
+            onChange={(images) => set('heroImages', images)}
+          />
+        </Field>
         </div>
       </Card>
 

@@ -14,6 +14,7 @@ const siteSettingsSchema = new mongoose.Schema(
     establishedYear: { type: String, default: '2005' },
     affiliation: { type: String, default: 'Tribhuvan University (TU)' },
 
+    heroImages: [{ type: String }],
     heroHeadline: { type: String, default: 'Shaping Careers, Building Futures' },
     heroSubheadline: {
       type: String,
