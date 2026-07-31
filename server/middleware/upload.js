@@ -22,13 +22,13 @@ const storage = multer.diskStorage({
 
 // Images + PDF — PDFs are needed for notice attachments and the navbar
 // "Download" resource, both of which accept "a PDF or an image".
-const ALLOWED_TYPES = /jpeg|jpg|png|gif|webp|avif|svg|pdf/;
+const ALLOWED_TYPES = /jpeg|jpg|png|gif|webp|avif|svg|pdf|heic|heif/;
 
 function fileFilter(req, file, cb) {
   const extOk = ALLOWED_TYPES.test(path.extname(file.originalname).toLowerCase());
   const mimeOk = ALLOWED_TYPES.test(file.mimetype);
   if (extOk && mimeOk) return cb(null, true);
-  cb(new Error('Only image files (jpg, png, gif, webp, avif, svg) or PDFs are allowed'));
+  cb(new Error('Only image files (jpg, png, gif, webp, avif, svg, heic, heif) or PDFs are allowed'));
 }
 
 export const upload = multer({
