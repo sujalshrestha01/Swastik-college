@@ -60,12 +60,16 @@ export default function Hero() {
   return (
     <section className="relative overflow-hidden bg-navy-900 text-paper">
       <HeroBackground images={images} />
+      <div
+      className="absolute inset-0 bg-gradient-to-r from-navy-900 via-navy-900/20 to-navy-900/10"
+      aria-hidden
+    />
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-28 sm:py-36 grid lg:grid-cols-2 gap-12 items-center">
         <div>
-          <h1 className="font-display text-4xl sm:text-5xl lg:text-[3.4rem] leading-[1.08] font-medium">
+          <h1 className="font-display text-4xl sm:text-5xl lg:text-[3.4rem] leading-[1.08] font-medium drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)]">
             {settings.heroHeadline}
           </h1>
-          <p className="mt-6 text-navy-100 text-base sm:text-lg max-w-xl">
+          <p className="mt-6 text-white/90 text-base sm:text-lg max-w-xl">
             {settings.heroSubheadline}
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-4">
@@ -78,7 +82,7 @@ export default function Hero() {
             </Link>
             <Link
               to={settings.heroCtaLink || '/programs'}
-              className="inline-flex items-center gap-2 border border-navy-500 hover:border-marigold-500 text-paper px-6 py-3 rounded-full transition-colors text-sm font-medium"
+              className="inline-flex items-center gap-2 border-2 border-navy-300 bg-black/10 backdrop-blur-md hover:border-marigold-500 text-paper px-6 py-3 rounded-full transition-all text-sm font-medium"
             >
               {settings.heroCtaText || 'Explore Programs'}
             </Link>
@@ -109,6 +113,7 @@ export default function Hero() {
           </div>
         </Section>
       </div>
+
     </section>
   );
 }
