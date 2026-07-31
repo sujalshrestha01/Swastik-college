@@ -25,6 +25,12 @@ export async function createCourse(req, res) {
     const course = await Course.create(req.body);
     res.status(201).json(course);
   } catch (err) {
+    if (err.code === 11000) {
+      return res.status(400).json({
+        message: 'A course with this slug already exists. Please choose a different URL slug.',
+        error: err.message,
+      });
+    }
     res.status(400).json({ message: 'Failed to create course', error: err.message });
   }
 }

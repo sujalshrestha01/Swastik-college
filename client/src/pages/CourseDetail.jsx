@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router';
 import { ChevronDown, Download, CheckCircle2, ArrowLeft } from 'lucide-react';
-import { getCourse } from '../api/client';
+import { getCourse, resolveImageUrl } from '../api/client';
 
 function AccordionItem({ semester, isOpen, onToggle }) {
   return (
@@ -61,7 +61,9 @@ export default function CourseDetail() {
       <p className="text-navy-400 dark:text-navy-300 mt-4 max-w-2xl leading-relaxed">{course.description}</p>
 
       <a
-        href={course.syllabusUrl}
+        href={resolveImageUrl(course.syllabusUrl)}
+        target="_blank"
+        rel="noreferrer"
         download
         className="inline-flex items-center gap-2 bg-navy hover:bg-navy-600 text-paper font-medium text-sm px-5 py-2.5 rounded-full mt-6 transition-colors"
       >

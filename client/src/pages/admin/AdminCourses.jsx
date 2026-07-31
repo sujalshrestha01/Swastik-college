@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Plus, Trash2, Pencil, X, Save, ChevronDown, ChevronUp } from 'lucide-react';
 import { coursesAdmin } from '../../api/client';
 import { Card, Field, Input, Textarea, Button, IconButton, Banner, EmptyState } from '../../components/admin/Ui';
+import FileUpload from '../../components/admin/FileUpload';
 
 const emptyCourse = () => ({
   slug: '',
@@ -18,7 +19,11 @@ const emptyCourse = () => ({
 });
 
 function slugify(text) {
-  return text.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  const base = text.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  // Fallback for names with no a-z0-9 characters (e.g. non-English course
+  // names) so we never generate an empty/duplicate slug that the server
+  // would reject with a confusing "duplicate key" error.
+  return base || `course-${Date.now().toString(36)}`;
 }
 
 export default function AdminCourses() {
@@ -188,8 +193,13 @@ export default function AdminCourses() {
             <Field label="Seats available">
               <Input type="number" value={editing.seats} onChange={(e) => updateField('seats', Number(e.target.value))} />
             </Field>
-            <Field label="Syllabus / brochure URL">
-              <Input value={editing.syllabusUrl} onChange={(e) => updateField('syllabusUrl', e.target.value)} placeholder="/syllabus/bsc-csit.pdf" />
+            <Field label="Syllabus / brochure PDF">
+              <FileUpload
+                value={editing.syllabusUrl}
+                onChange={(url) => updateField('syllabusUrl', url)}
+                accept="application/pdf"
+                hint="Upload the syllabus PDF for this course"
+              />
             </Field>
             <Field label="Display order" hint="Lower numbers appear first">
               <Input type="number" value={editing.order} onChange={(e) => updateField('order', Number(e.target.value))} />
