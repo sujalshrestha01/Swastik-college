@@ -16,12 +16,12 @@ export default function QuickAccessCards() {
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 -mt-10 sm:-mt-12 relative z-10">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:flex md:justify-center">
         {cards.map(({ icon: Icon, title, desc, to }) => (
           <Link
             key={title}
             to={to}
-            className="group bg-white dark:bg-slate-900 rounded-xl p-5 border-b-2 border-b-transparent hover:border-b-[#1E3A8A] dark:hover:border-b-blue-400 hover:-translate-y-1 transition-all duration-300"
+            className="group bg-white dark:bg-slate-900 rounded-xl p-5 border-b-2 border-b-transparent hover:border-b-[#1E3A8A] dark:hover:border-b-blue-400 hover:-translate-y-1 transition-all duration-300 w-full lg:max-w-xs"
           >
             <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-slate-800 text-[#1E3A8A] dark:text-blue-400 group-hover:bg-[#1E3A8A] group-hover:text-white flex items-center justify-center mb-4 transition-colors">
               <Icon size={19} />
