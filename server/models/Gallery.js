@@ -27,6 +27,9 @@ const galleryEventSchema = new mongoose.Schema(
     // Index into `images` (or the image's _id) used as the cover/thumbnail.
     thumbnailId: { type: String, default: '' },
     order: { type: Number, default: 0 },
+    // When true, this album's cover shows up in the "Swastik Experience"
+    // showcase on the home page (in addition to the full Gallery page).
+    featuredOnHome: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

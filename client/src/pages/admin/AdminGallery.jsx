@@ -14,6 +14,7 @@ const empty = () => ({
   images: [],
   thumbnailId: '',
   order: 0,
+  featuredOnHome: false,
 });
 
 export default function AdminGallery() {
@@ -95,6 +96,15 @@ export default function AdminGallery() {
           <Field label="Description" className="mt-4">
             <Textarea rows={3} value={editing.description} onChange={(e) => setEditing({ ...editing, description: e.target.value })} />
           </Field>
+            <label className="mt-4 flex items-center gap-2 text-sm text-navy-700 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={!!editing.featuredOnHome}
+                onChange={(e) => setEditing({ ...editing, featuredOnHome: e.target.checked })}
+              />
+              Show in "The Swastik Experience" on the home page
+            </label>
+            <p className="text-xs text-navy-400 mt-1">Up to 4 featured albums show there, using the same "Display order" field above (lowest first).</p>
         </Card>
       </div>
     );
@@ -124,6 +134,11 @@ export default function AdminGallery() {
                 <span className="absolute top-2 right-2 bg-navy-950/70 text-white text-[11px] px-2 py-0.5 rounded-full flex items-center gap-1">
                   <Images size={11} /> {event.images?.length || 0}
                 </span>
+                {event.featuredOnHome && (
+                <span className="absolute bottom-2 left-2 bg-marigold-400 text-navy-950 text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                  Featured on Home
+                </span>
+              )}
               </div>
               <div className="p-3">
                 <p className="text-xs text-marigold-600 font-semibold">{event.category}</p>

@@ -20,6 +20,7 @@ export const VISIBILITY_SCHEMA = {
       quickAccess: 'Quick Access Cards',
       whyChooseUs: 'Why Choose Us',
       programsOverview: 'Programs Overview',
+      swastikExperience: 'The Swastik Experience',
       eventCountdown: 'Event Countdown',
       newsEvents: 'News & Events',
       upcomingEvents: 'Upcoming Events',
