@@ -9,6 +9,7 @@ const eventSchema = new mongoose.Schema(
     imageUrl: { type: String, default: '' },
     type: { type: String, enum: ['Event', 'Workshop', 'Seminar', 'Fest', 'Other'], default: 'Event' },
     isFeatured: { type: Boolean, default: false },
+    statusOverride: { type: String, enum: ['auto', 'upcoming', 'ongoing', 'completed'], default: 'auto' },
   },
   { timestamps: true }
 );

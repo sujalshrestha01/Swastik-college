@@ -6,7 +6,7 @@ import ImageUpload from '../../components/admin/ImageUpload';
 
 const types = ['Event', 'Workshop', 'Seminar', 'Fest', 'Other'];
 const empty = () => ({
-  title: '', description: '', date: new Date().toISOString().slice(0, 16), location: 'Main Campus', type: 'Event', isFeatured: false, imageUrl: '',
+  title: '', description: '', date: new Date().toISOString().slice(0, 16), location: 'College', type: 'Event', isFeatured: false, imageUrl: '', statusOverride: 'auto',
 });
 
 export default function AdminEvents() {
@@ -74,6 +74,20 @@ export default function AdminEvents() {
             </div>
             <Field label="Location"><Input value={editing.location} onChange={(e) => setEditing({ ...editing, location: e.target.value })} /></Field>
             <Field label="Description"><Textarea rows={3} value={editing.description} onChange={(e) => setEditing({ ...editing, description: e.target.value })} /></Field>
+
+            <Field label="Status (on the homepage Upcoming Events widget)">
+              <Select value={editing.statusOverride || 'auto'} onChange={(e) => setEditing({ ...editing, statusOverride: e.target.value })}>
+                <option value="auto">Auto (based on date)</option>
+                <option value="upcoming">Upcoming</option>
+                <option value="ongoing">Ongoing</option>
+                <option value="completed">Completed</option>
+              </Select>
+              <p className="text-xs text-navy-400 mt-1">
+                "Auto" shows the date until the event starts, then "Ongoing" for the rest of that day, then drops off the list.
+                Choosing Upcoming / Ongoing / Completed overrides that and stays fixed until you change it.
+              </p>
+            </Field>
+
             <label className="flex items-center gap-2">
               <input type="checkbox" checked={editing.isFeatured} onChange={(e) => setEditing({ ...editing, isFeatured: e.target.checked })} />
               <span className="text-sm text-navy-700">Feature this event on the homepage</span>
@@ -105,6 +119,9 @@ export default function AdminEvents() {
                   <div className="flex items-center gap-2">
                     <h3 className="font-display text-navy-800">{ev.title}</h3>
                     {ev.isFeatured && <span className="text-xs bg-marigold-100 text-marigold-600 px-2 py-0.5 rounded-full">Featured</span>}
+                    {ev.statusOverride && ev.statusOverride !== 'auto' && (
+                      <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full capitalize">{ev.statusOverride}</span>
+                    )}
                   </div>
                   <p className="text-xs text-navy-400 mt-1">{new Date(ev.date).toLocaleString()} · {ev.location} · {ev.type}</p>
                   {ev.description && <p className="text-sm text-navy-500 mt-1">{ev.description}</p>}

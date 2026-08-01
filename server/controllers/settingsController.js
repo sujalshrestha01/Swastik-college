@@ -22,6 +22,7 @@ export const VISIBILITY_SCHEMA = {
       programsOverview: 'Programs Overview',
       eventCountdown: 'Event Countdown',
       newsEvents: 'News & Events',
+      upcomingEvents: 'Upcoming Events',
       takeATour: 'Take a Tour',
       placementPartners: 'Placement Partners',
       sisterInstitutes: 'Sister Institutes',
