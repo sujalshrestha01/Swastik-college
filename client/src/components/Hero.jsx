@@ -1,11 +1,11 @@
 // client/src/components/Hero.jsx — replace the whole file
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router';
-import { ArrowUpRight } from 'lucide-react';
-import { useSettings } from '../context/SettingsContext';
-import { resolveImageUrl } from '../api/client';
-import { Section } from './Visibility';
-import img1 from '../../assets/img1.jpg';
+import { useEffect, useState } from "react";
+import { Link } from "react-router";
+import { ArrowUpRight } from "lucide-react";
+import { useSettings } from "../context/SettingsContext";
+import { resolveImageUrl } from "../api/client";
+import { Section } from "./Visibility";
+import img1 from "../../assets/img1.jpg";
 
 function HeroBackground({ images }) {
   const [index, setIndex] = useState(0);
@@ -26,8 +26,8 @@ function HeroBackground({ images }) {
           className="absolute inset-0 opacity-[0.4] transition-opacity duration-1000 ease-in-out"
           style={{
             backgroundImage: `url(${src})`,
-            backgroundPosition: 'center center',
-            backgroundSize: 'cover',
+            backgroundPosition: "center center",
+            backgroundSize: "cover",
             opacity: i === index ? 0.6 : 0,
           }}
           aria-hidden
@@ -41,7 +41,9 @@ function HeroBackground({ images }) {
               onClick={() => setIndex(i)}
               aria-label={`Show slide ${i + 1}`}
               className={`h-1.5 rounded-full transition-all ${
-                i === index ? 'w-6 bg-marigold-400' : 'w-1.5 bg-navy-300/60 hover:bg-navy-200'
+                i === index
+                  ? "w-6 bg-marigold-400"
+                  : "w-1.5 bg-navy-300/60 hover:bg-navy-200"
               }`}
             />
           ))}
@@ -54,16 +56,18 @@ function HeroBackground({ images }) {
 export default function Hero() {
   const { settings } = useSettings();
   const carouselImages = (settings.heroImages || []).map(resolveImageUrl);
-  const fallbackImage = settings.heroImageUrl ? resolveImageUrl(settings.heroImageUrl) : img1;
+  const fallbackImage = settings.heroImageUrl
+    ? resolveImageUrl(settings.heroImageUrl)
+    : img1;
   const images = carouselImages.length > 0 ? carouselImages : [fallbackImage];
 
   return (
     <section className="relative overflow-hidden bg-navy-900 text-paper">
       <HeroBackground images={images} />
       <div
-      className="absolute inset-0 bg-gradient-to-r from-navy-900 via-navy-900/20 to-navy-900/10"
-      aria-hidden
-    />
+        className="absolute inset-0 bg-gradient-to-r from-navy-900 via-navy-900/20 to-navy-900/10"
+        aria-hidden
+      />
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-28 sm:py-36 grid lg:grid-cols-2 gap-12 items-center">
         <div>
           <h1 className="font-display text-4xl sm:text-5xl lg:text-[3.4rem] leading-[1.08] font-medium drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)]">
@@ -81,10 +85,10 @@ export default function Hero() {
               <ArrowUpRight size={18} />
             </Link>
             <Link
-              to={settings.heroCtaLink || '/programs'}
+              to={settings.heroCtaLink || "/programs"}
               className="inline-flex items-center gap-2 border-2 border-navy-300 bg-black/10 backdrop-blur-md hover:border-marigold-500 text-paper px-6 py-3 rounded-full transition-all text-sm font-medium"
             >
-              {settings.heroCtaText || 'Explore Programs'}
+              {settings.heroCtaText || "Explore Programs"}
             </Link>
           </div>
         </div>
@@ -98,14 +102,25 @@ export default function Hero() {
               <span className="ml-3 text-navy-300">college_status.log</span>
             </div>
             <ul className="space-y-2.5 text-navy-100">
-              {(settings.heroStatusLog?.length ? settings.heroStatusLog : []).map((row, i) => (
+              {(settings.heroStatusLog?.length
+                ? settings.heroStatusLog
+                : []
+              ).map((row, i) => (
                 <li key={i} className="flex justify-between">
                   <span className="text-navy-400">{row.label}</span>
-                  <span className={row.label === 'admissions' ? 'text-marigold-300' : ''}>
-                    {row.value || (row.label === 'college' ? settings.collegeShortName
-                      : row.label === 'affiliation' ? settings.affiliation
-                      : row.label === 'contact' ? settings.phone
-                      : '')}
+                  <span
+                    className={
+                      row.label === "admissions" ? "text-marigold-300" : ""
+                    }
+                  >
+                    {row.value ||
+                      (row.label === "college"
+                        ? settings.collegeShortName
+                        : row.label === "affiliation"
+                          ? settings.affiliation
+                          : row.label === "contact"
+                            ? settings.phone
+                            : "")}
                   </span>
                 </li>
               ))}
@@ -113,7 +128,6 @@ export default function Hero() {
           </div>
         </Section>
       </div>
-
     </section>
   );
 }

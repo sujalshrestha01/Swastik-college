@@ -1,5 +1,5 @@
- import { useState } from 'react';
-import { Document, Page, pdfjs } from 'react-pdf';
+import { useState } from "react";
+import { Document, Page, pdfjs } from "react-pdf";
 
 // Configure the worker (standard setup for react-pdf)
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
@@ -20,7 +20,7 @@ export function PdfThumbnail({ url }) {
           width={180} // Scaled down thumbnail size
           renderTextLayer={false}
           renderAnnotationLayer={false}
-          className={loaded ? 'opacity-100 transition-opacity' : 'opacity-0'}
+          className={loaded ? "opacity-100 transition-opacity" : "opacity-0"}
         />
       </Document>
     </div>

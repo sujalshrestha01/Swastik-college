@@ -1,14 +1,14 @@
-import { useState } from 'react';
-import { Link } from 'react-router';
-import { Plus, X, MessageCircle, ClipboardEdit } from 'lucide-react';
-import ChatWithAdmissions from './ChatWithAdmissions';
-import { useSettings } from '../context/SettingsContext';
+import { useState } from "react";
+import { Link } from "react-router";
+import { Plus, X, MessageCircle, ClipboardEdit } from "lucide-react";
+import ChatWithAdmissions from "./ChatWithAdmissions";
+import { useSettings } from "../context/SettingsContext";
 
 export default function FloatingQuickAction() {
   const [open, setOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const { isPageEnabled } = useSettings();
-  const contactEnabled = isPageEnabled('contact');
+  const contactEnabled = isPageEnabled("contact");
 
   return (
     <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3">
@@ -17,7 +17,10 @@ export default function FloatingQuickAction() {
       {open && !chatOpen && (
         <div className="flex flex-col gap-2 items-end animate-[fadeIn_0.15s_ease-out]">
           <button
-            onClick={() => { setChatOpen(true); setOpen(false); }}
+            onClick={() => {
+              setChatOpen(true);
+              setOpen(false);
+            }}
             className="flex items-center gap-2 bg-white dark:bg-navy-800 border border-navy-100 dark:border-navy-700 shadow-lg text-navy dark:text-paper text-sm font-medium pl-4 pr-3 py-2.5 rounded-full hover:border-marigold-300 transition-colors"
           >
             Chat with Admissions
@@ -26,24 +29,29 @@ export default function FloatingQuickAction() {
             </span>
           </button>
           {contactEnabled && (
-          <Link
-            to="/contact"
-            className="flex items-center gap-2 bg-white dark:bg-navy-800 border border-navy-100 dark:border-navy-700 shadow-lg text-navy dark:text-paper text-sm font-medium pl-4 pr-3 py-2.5 rounded-full hover:border-marigold-300 transition-colors"
-          >
-            Apply Now
-            <span className="w-7 h-7 rounded-full bg-marigold-50 dark:bg-navy-700 text-marigold-600 dark:text-marigold-300 flex items-center justify-center">
-              <ClipboardEdit size={14} />
-            </span>
-          </Link>
+            <Link
+              to="/contact"
+              className="flex items-center gap-2 bg-white dark:bg-navy-800 border border-navy-100 dark:border-navy-700 shadow-lg text-navy dark:text-paper text-sm font-medium pl-4 pr-3 py-2.5 rounded-full hover:border-marigold-300 transition-colors"
+            >
+              Apply Now
+              <span className="w-7 h-7 rounded-full bg-marigold-50 dark:bg-navy-700 text-marigold-600 dark:text-marigold-300 flex items-center justify-center">
+                <ClipboardEdit size={14} />
+              </span>
+            </Link>
           )}
         </div>
       )}
       <button
         onClick={() => {
-          if (chatOpen) { setChatOpen(false); return; }
+          if (chatOpen) {
+            setChatOpen(false);
+            return;
+          }
           setOpen((o) => !o);
         }}
-        aria-label={open || chatOpen ? 'Close quick actions' : 'Open quick actions'}
+        aria-label={
+          open || chatOpen ? "Close quick actions" : "Open quick actions"
+        }
         aria-expanded={open || chatOpen}
         className="w-14 h-14 rounded-full bg-marigold hover:bg-marigold-500 text-navy-900 shadow-lg flex items-center justify-center transition-transform hover:scale-105"
       >

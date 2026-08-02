@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router';
-import { ArrowUpRight, Clock, Users, Award } from 'lucide-react';
-import { getCourses } from '../api/client';
-import { useSettings } from '../context/SettingsContext';
+import { useEffect, useState } from "react";
+import { Link } from "react-router";
+import { ArrowUpRight, Clock, Users, Award } from "lucide-react";
+import { getCourses } from "../api/client";
+import { useSettings } from "../context/SettingsContext";
 
 export default function ProgramsOverview() {
   const [programs, setPrograms] = useState([]);
   const { isPageEnabled } = useSettings();
-  const enabled = isPageEnabled('programs');
+  const enabled = isPageEnabled("programs");
 
   useEffect(() => {
     if (enabled) getCourses().then(setPrograms);
@@ -27,7 +27,7 @@ export default function ProgramsOverview() {
             Academic Programs
           </h2>
         </div>
-        
+
         {/* View All Link */}
         <Link
           to="/programs"
@@ -76,11 +76,17 @@ export default function ProgramsOverview() {
             {/* Card Footer */}
             <div className="mt-6 pt-4 border-t border-slate-100 dark:border-navy-700/80 flex items-center justify-between text-xs font-mono text-slate-500 dark:text-navy-100/70">
               <span className="flex items-center gap-1.5">
-                <Clock size={14} className="text-[#1E3A8A] dark:text-[#3B82F6]" />
+                <Clock
+                  size={14}
+                  className="text-[#1E3A8A] dark:text-[#3B82F6]"
+                />
                 {p.duration}
               </span>
               <span className="flex items-center gap-1.5">
-                <Users size={14} className="text-[#1E3A8A] dark:text-[#3B82F6]" />
+                <Users
+                  size={14}
+                  className="text-[#1E3A8A] dark:text-[#3B82F6]"
+                />
                 {p.seats} seats
               </span>
             </div>
@@ -110,7 +116,8 @@ export default function ProgramsOverview() {
             </p>
 
             <p className="text-sm text-slate-600 dark:text-navy-100 mt-3 leading-relaxed line-clamp-3">
-              Industry-aligned training programs, hands-on tech workshops, and skill booster certifications running alongside degree courses.
+              Industry-aligned training programs, hands-on tech workshops, and
+              skill booster certifications running alongside degree courses.
             </p>
           </div>
 

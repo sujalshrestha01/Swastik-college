@@ -1,12 +1,12 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const subjectSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
-    code: { type: String, default: '' },
+    code: { type: String, default: "" },
     creditHours: { type: Number, default: 3 },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const semesterSchema = new mongoose.Schema(
@@ -17,7 +17,7 @@ const semesterSchema = new mongoose.Schema(
     courses: [{ type: String }],
     subjects: [subjectSchema],
   },
-  { _id: false }
+  { _id: false },
 );
 
 const courseSchema = new mongoose.Schema(
@@ -30,11 +30,11 @@ const courseSchema = new mongoose.Schema(
     description: { type: String, required: true },
     eligibility: [{ type: String }],
     semesters: [semesterSchema],
-    syllabusUrl: { type: String, default: '' },
+    syllabusUrl: { type: String, default: "" },
     isActive: { type: Boolean, default: true },
     order: { type: Number, default: 0 },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-export default mongoose.model('Course', courseSchema);
+export default mongoose.model("Course", courseSchema);

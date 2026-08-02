@@ -1,22 +1,28 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Search, Download, Bell, ChevronLeft, ChevronRight } from 'lucide-react';
-import { getNotices, resolveImageUrl } from '../api/client';
-import { Section } from '../components/Visibility';
+import { useEffect, useMemo, useState } from "react";
+import {
+  Search,
+  Download,
+  Bell,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import { getNotices, resolveImageUrl } from "../api/client";
+import { Section } from "../components/Visibility";
 
-const CATEGORIES = ['All', 'Exams', 'Admissions', 'Events', 'General'];
+const CATEGORIES = ["All", "Exams", "Admissions", "Events", "General"];
 
 function formatDate(iso) {
-  return new Date(iso).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
+  return new Date(iso).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
   });
 }
 
 export default function NoticeBoard() {
   const [notices, setNotices] = useState([]);
-  const [query, setQuery] = useState('');
-  const [category, setCategory] = useState('All');
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("All");
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -28,13 +34,13 @@ export default function NoticeBoard() {
 
   const filtered = useMemo(() => {
     return notices
-      .filter((n) => (category === 'All' ? true : n.category === category))
+      .filter((n) => (category === "All" ? true : n.category === category))
       .filter((n) =>
-        query.trim() === ''
+        query.trim() === ""
           ? true
-          : (n.title + ' ' + n.excerpt)
+          : (n.title + " " + n.excerpt)
               .toLowerCase()
-              .includes(query.toLowerCase())
+              .includes(query.toLowerCase()),
       )
       .sort((a, b) => new Date(b.date) - new Date(a.date));
   }, [notices, query, category]);
@@ -48,7 +54,7 @@ export default function NoticeBoard() {
 
   const currentNotices = filtered.slice(
     (currentPage - 1) * noticesPerPage,
-    currentPage * noticesPerPage
+    currentPage * noticesPerPage,
   );
 
   return (
@@ -90,8 +96,8 @@ export default function NoticeBoard() {
                 onClick={() => setCategory(c)}
                 className={`shrink-0 px-4 py-2 rounded-full text-xs font-medium border transition-colors ${
                   category === c
-                    ? 'bg-[#D9383A] text-white border-[#D9383A] dark:bg-[#1E3A8A] dark:border-[#1E3A8A]'
-                    : 'border-navy-100 dark:border-navy-700 text-navy-500 dark:text-navy-200 hover:border-[#D9383A] dark:hover:border-[#1E3A8A] hover:text-[#D9383A] dark:hover:text-[#3B82F6]'
+                    ? "bg-[#D9383A] text-white border-[#D9383A] dark:bg-[#1E3A8A] dark:border-[#1E3A8A]"
+                    : "border-navy-100 dark:border-navy-700 text-navy-500 dark:text-navy-200 hover:border-[#D9383A] dark:hover:border-[#1E3A8A] hover:text-[#D9383A] dark:hover:text-[#3B82F6]"
                 }`}
               >
                 {c}
@@ -101,7 +107,7 @@ export default function NoticeBoard() {
         </div>
 
         <p className="text-xs text-navy-400 dark:text-navy-300 mb-4 font-mono">
-          {filtered.length} notice{filtered.length !== 1 ? 's' : ''} found
+          {filtered.length} notice{filtered.length !== 1 ? "s" : ""} found
         </p>
 
         <div className="space-y-3">
@@ -156,9 +162,7 @@ export default function NoticeBoard() {
         {totalPages > 1 && (
           <div className="flex items-center justify-center gap-2 mt-10 flex-wrap">
             <button
-              onClick={() =>
-                setCurrentPage((prev) => Math.max(prev - 1, 1))
-              }
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
               className="flex items-center gap-1 px-4 py-2 rounded-lg border border-navy-200 dark:border-navy-700 text-sm disabled:opacity-50 disabled:cursor-not-allowed hover:border-[#D9383A] dark:hover:border-[#1E3A8A]"
             >
@@ -175,8 +179,8 @@ export default function NoticeBoard() {
                   onClick={() => setCurrentPage(page)}
                   className={`w-10 h-10 rounded-lg border text-sm transition-colors ${
                     currentPage === page
-                      ? 'bg-[#D9383A] text-white border-[#D9383A] dark:bg-[#1E3A8A] dark:border-[#1E3A8A]'
-                      : 'border-navy-200 dark:border-navy-700 text-navy dark:text-paper hover:border-[#D9383A] dark:hover:border-[#1E3A8A]'
+                      ? "bg-[#D9383A] text-white border-[#D9383A] dark:bg-[#1E3A8A] dark:border-[#1E3A8A]"
+                      : "border-navy-200 dark:border-navy-700 text-navy dark:text-paper hover:border-[#D9383A] dark:hover:border-[#1E3A8A]"
                   }`}
                 >
                   {page}

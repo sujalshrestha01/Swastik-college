@@ -1,19 +1,16 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router';
-import { getGalleryEvents, resolveImageUrl } from '../api/client';
+import { useEffect, useState } from "react";
+import { Link } from "react-router";
+import { getGalleryEvents, resolveImageUrl } from "../api/client";
 
 function thumbFor(event) {
   if (event.thumbnailUrl) return event.thumbnailUrl;
-  const match = event.images?.find((img) => String(img._id) === String(event.thumbnailId));
-  return (match || event.images?.[0])?.url || '';
+  const match = event.images?.find(
+    (img) => String(img._id) === String(event.thumbnailId),
+  );
+  return (match || event.images?.[0])?.url || "";
 }
 
-const SLOT_CLASSES = [
-  'md:col-span-2 md:row-span-2',
-  '',
-  '',
-  'md:col-span-2',
-];
+const SLOT_CLASSES = ["md:col-span-2 md:row-span-2", "", "", "md:col-span-2"];
 
 function Tile({ event, className }) {
   return (
@@ -32,7 +29,9 @@ function Tile({ event, className }) {
           {event.title}
         </h3>
         {event.description && (
-          <p className="text-slate-200/90 text-sm mt-1 line-clamp-2">{event.description}</p>
+          <p className="text-slate-200/90 text-sm mt-1 line-clamp-2">
+            {event.description}
+          </p>
         )}
       </div>
     </Link>
@@ -59,17 +58,25 @@ export default function SwastikExperience() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="text-center max-w-2xl mx-auto mb-10">
           <h2 className="font-display text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white">
-            THE SWASTIK <span className="text-[#D9383A] dark:text-[#3B82F6]">EXPERIENCE</span>
+            THE SWASTIK{" "}
+            <span className="text-[#D9383A] dark:text-[#3B82F6]">
+              EXPERIENCE
+            </span>
           </h2>
           <p className="text-slate-500 dark:text-navy-100/70 mt-3 text-sm sm:text-base">
-            A college experience transcends beyond just classrooms and lecture theatres. Celebrate our
-            fun-filled events throughout the academic year. Come and live the Swastik Experience!
+            A college experience transcends beyond just classrooms and lecture
+            theatres. Celebrate our fun-filled events throughout the academic
+            year. Come and live the Swastik Experience!
           </p>
         </div>
 
         <div className="grid md:grid-cols-4 md:grid-rows-2 gap-4">
           {featured.map((event, i) => (
-            <Tile key={event._id || event.id} event={event} className={SLOT_CLASSES[i]} />
+            <Tile
+              key={event._id || event.id}
+              event={event}
+              className={SLOT_CLASSES[i]}
+            />
           ))}
         </div>
       </div>

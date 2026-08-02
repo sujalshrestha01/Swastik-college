@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { Quote } from 'lucide-react';
-import { getTestimonials } from '../api/client';
+import { useEffect, useState } from "react";
+import { Quote } from "lucide-react";
+import { getTestimonials } from "../api/client";
 
 export default function Testimonials() {
   const [testimonials, setTestimonials] = useState([]);
@@ -21,7 +21,8 @@ export default function Testimonials() {
           Alumni Success Stories
         </h2>
         <p className="text-slate-600 dark:text-slate-300 mt-2 text-sm">
-          Hear what our graduates have to say about their journey and experiences with us.
+          Hear what our graduates have to say about their journey and
+          experiences with us.
         </p>
       </div>
 
@@ -32,11 +33,11 @@ export default function Testimonials() {
             className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 flex flex-col hover:border-b-2 hover:border-b-[#D9383A] transition-all duration-300 shadow-sm hover:shadow-md"
           >
             <Quote className="text-[#D9383A]" size={28} />
-            
+
             <blockquote className="text-sm text-slate-600 dark:text-slate-300 mt-4 leading-relaxed flex-1 italic">
               "{t.quote}"
             </blockquote>
-            
+
             <figcaption className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
               <div>
                 <p className="font-display text-sm font-bold text-[#1E3A8A] dark:text-blue-400">

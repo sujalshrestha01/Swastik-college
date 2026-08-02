@@ -1,36 +1,36 @@
-import { useState } from 'react';
-import { useNavigate, useSearchParams, Link } from 'react-router';
-import { ShieldCheck } from 'lucide-react';
-import { acceptInvite } from '../../api/client';
-import { useAuth } from '../../context/AuthContext';
-import { Field, Input, Button, Banner } from '../../components/admin/Ui';
+import { useState } from "react";
+import { useNavigate, useSearchParams, Link } from "react-router";
+import { ShieldCheck } from "lucide-react";
+import { acceptInvite } from "../../api/client";
+import { useAuth } from "../../context/AuthContext";
+import { Field, Input, Button, Banner } from "../../components/admin/Ui";
 
 export default function AcceptInvite() {
   const [searchParams] = useSearchParams();
-  const token = searchParams.get('token') || '';
+  const token = searchParams.get("token") || "";
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const [password, setPassword] = useState('');
-  const [confirm, setConfirm] = useState('');
-  const [error, setError] = useState('');
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (!token) {
-      setError('This invite link is missing its token.');
+      setError("This invite link is missing its token.");
       return;
     }
     if (password.length < 8) {
-      setError('Password must be at least 8 characters.');
+      setError("Password must be at least 8 characters.");
       return;
     }
     if (password !== confirm) {
-      setError('Passwords do not match.');
+      setError("Passwords do not match.");
       return;
     }
 
@@ -40,9 +40,9 @@ export default function AcceptInvite() {
       setDone(true);
       // Log the newly-activated admin straight in.
       await login(admin.email, password);
-      setTimeout(() => navigate('/admin', { replace: true }), 800);
+      setTimeout(() => navigate("/admin", { replace: true }), 800);
     } catch (err) {
-      setError(err.message || 'Could not activate this invite');
+      setError(err.message || "Could not activate this invite");
     } finally {
       setLoading(false);
     }
@@ -55,8 +55,12 @@ export default function AcceptInvite() {
           <div className="w-12 h-12 rounded-full bg-marigold-100 text-marigold-500 flex items-center justify-center mb-3">
             <ShieldCheck size={22} />
           </div>
-          <h1 className="font-display text-xl text-navy-800">Activate Your Admin Account</h1>
-          <p className="text-sm text-navy-500 mt-1">Set a password to finish accepting your invite</p>
+          <h1 className="font-display text-xl text-navy-800">
+            Activate Your Admin Account
+          </h1>
+          <p className="text-sm text-navy-500 mt-1">
+            Set a password to finish accepting your invite
+          </p>
         </div>
 
         {error && (
@@ -90,14 +94,21 @@ export default function AcceptInvite() {
                 placeholder="••••••••"
               />
             </Field>
-            <Button type="submit" disabled={loading} className="w-full justify-center">
-              {loading ? 'Activating…' : 'Activate Account'}
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full justify-center"
+            >
+              {loading ? "Activating…" : "Activate Account"}
             </Button>
           </form>
         )}
 
         <p className="text-xs text-navy-400 text-center mt-6">
-          Already activated? <Link to="/admin/login" className="text-marigold-500 font-medium">Sign in</Link>
+          Already activated?{" "}
+          <Link to="/admin/login" className="text-marigold-500 font-medium">
+            Sign in
+          </Link>
         </p>
       </div>
     </div>

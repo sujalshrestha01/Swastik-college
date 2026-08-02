@@ -1,5 +1,11 @@
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { getToken, setToken, fetchMe, login as apiLogin } from '../api/client';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
+import { getToken, setToken, fetchMe, login as apiLogin } from "../api/client";
 
 const AuthContext = createContext(null);
 
@@ -41,7 +47,9 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ admin, loading, login, logout, isAuthenticated: !!admin }}>
+    <AuthContext.Provider
+      value={{ admin, loading, login, logout, isAuthenticated: !!admin }}
+    >
       {children}
     </AuthContext.Provider>
   );

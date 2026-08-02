@@ -1,4 +1,4 @@
-import SiteSettings from '../models/SiteSettings.js';
+import SiteSettings from "../models/SiteSettings.js";
 
 // The full catalogue of pages + toggleable sections inside each page.
 // This drives BOTH the admin "Page & Section Visibility" screen and acts as
@@ -13,99 +13,99 @@ import SiteSettings from '../models/SiteSettings.js';
 // }
 export const VISIBILITY_SCHEMA = {
   home: {
-    label: 'Home',
+    label: "Home",
     sections: {
-      hero: 'Hero Banner',
-      heroStatusLog: 'Hero Status Log Card', 
-      quickAccess: 'Quick Access Cards',
-      whyChooseUs: 'Why Choose Us',
-      programsOverview: 'Programs Overview',
-      swastikExperience: 'The Swastik Experience',
-      eventCountdown: 'Event Countdown',
-      newsEvents: 'News & Events',
-      upcomingEvents: 'Upcoming Events',
-      takeATour: 'Take a Tour',
-      placementPartners: 'Placement Partners',
-      sisterInstitutes: 'Sister Institutes',
-      blog: 'Latest from the Blog',
+      hero: "Hero Banner",
+      heroStatusLog: "Hero Status Log Card",
+      quickAccess: "Quick Access Cards",
+      whyChooseUs: "Why Choose Us",
+      programsOverview: "Programs Overview",
+      swastikExperience: "The Swastik Experience",
+      eventCountdown: "Event Countdown",
+      newsEvents: "News & Events",
+      upcomingEvents: "Upcoming Events",
+      takeATour: "Take a Tour",
+      placementPartners: "Placement Partners",
+      sisterInstitutes: "Sister Institutes",
+      blog: "Latest from the Blog",
     },
   },
   about: {
-    label: 'About Us',
+    label: "About Us",
     sections: {
-      hero: 'Page Hero',
-      journey: 'Our Journey',
-      missionVision: 'Mission & Vision',
-      values: 'Core Values',
-      leadership: 'Leadership Message',
-      stats: 'Stats Strip',
+      hero: "Page Hero",
+      journey: "Our Journey",
+      missionVision: "Mission & Vision",
+      values: "Core Values",
+      leadership: "Leadership Message",
+      stats: "Stats Strip",
     },
   },
   programs: {
-    label: 'Programs',
+    label: "Programs",
     sections: {
-      hero: 'Page Hero',
-      list: 'Programs List',
-      nonCredit: 'Non-Credit Courses Banner',
+      hero: "Page Hero",
+      list: "Programs List",
+      nonCredit: "Non-Credit Courses Banner",
     },
   },
   faculty: {
-    label: 'Faculty',
+    label: "Faculty",
     sections: {
-      hero: 'Page Hero',
-      grid: 'Faculty Grid',
+      hero: "Page Hero",
+      grid: "Faculty Grid",
     },
   },
   gallery: {
-    label: 'Gallery',
+    label: "Gallery",
     sections: {
-      hero: 'Page Hero',
-      grid: 'Gallery Grid',
+      hero: "Page Hero",
+      grid: "Gallery Grid",
     },
   },
   blog: {
-    label: 'Blog',
+    label: "Blog",
     sections: {
-      hero: 'Page Hero',
-      list: 'Blog List',
+      hero: "Page Hero",
+      list: "Blog List",
     },
   },
   notices: {
-    label: 'Notice Board',
+    label: "Notice Board",
     sections: {
-      hero: 'Page Hero',
-      list: 'Notices List',
+      hero: "Page Hero",
+      list: "Notices List",
     },
   },
   downloads: {
-    label: 'Downloads',
+    label: "Downloads",
     sections: {
-      hero: 'Page Hero',
-      list: 'Downloads List',
+      hero: "Page Hero",
+      list: "Downloads List",
     },
   },
   contact: {
-    label: 'Contact',
+    label: "Contact",
     sections: {
-      hero: 'Page Hero',
-      form: 'Inquiry Form',
-      map: 'Map',
+      hero: "Page Hero",
+      form: "Inquiry Form",
+      map: "Map",
     },
   },
   global: {
-    label: 'Global / Site-wide',
+    label: "Global / Site-wide",
     sections: {
-      navbar: 'Navbar',
-      footer: 'Footer',
-      floatingQuickAction: 'Floating Quick Action Button',
-      announcementBar: 'Announcement Bar',
+      navbar: "Navbar",
+      footer: "Footer",
+      floatingQuickAction: "Floating Quick Action Button",
+      announcementBar: "Announcement Bar",
     },
   },
 };
 
 async function getOrCreateSettings() {
-  let settings = await SiteSettings.findOne({ key: 'main' });
-  if (!settings) settings = await SiteSettings.create({ key: 'main' });
+  let settings = await SiteSettings.findOne({ key: "main" });
+  if (!settings) settings = await SiteSettings.create({ key: "main" });
   return settings;
 }
 
@@ -117,12 +117,16 @@ function withVisibilityDefaults(saved = {}) {
     const sections = {};
     for (const sectionKey of Object.keys(pageDef.sections)) {
       sections[sectionKey] =
-        savedPage.sections && typeof savedPage.sections[sectionKey] === 'boolean'
+        savedPage.sections &&
+        typeof savedPage.sections[sectionKey] === "boolean"
           ? savedPage.sections[sectionKey]
           : true;
     }
     merged[pageKey] = {
-      pageEnabled: typeof savedPage.pageEnabled === 'boolean' ? savedPage.pageEnabled : true,
+      pageEnabled:
+        typeof savedPage.pageEnabled === "boolean"
+          ? savedPage.pageEnabled
+          : true,
       sections,
     };
   }
@@ -137,7 +141,9 @@ export async function getSettings(req, res) {
     json.visibility = withVisibilityDefaults(json.visibility);
     res.json(json);
   } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch settings', error: err.message });
+    res
+      .status(500)
+      .json({ message: "Failed to fetch settings", error: err.message });
   }
 }
 
@@ -150,15 +156,17 @@ export function getVisibilitySchema(req, res) {
 export async function updateSettings(req, res) {
   try {
     const updatedSettings = await SiteSettings.findOneAndUpdate(
-      { key: 'main' },
+      { key: "main" },
       { $set: req.body },
-      { new: true, upsert: true, runValidators: true }
+      { new: true, upsert: true, runValidators: true },
     );
     const json = updatedSettings.toObject();
     json.visibility = withVisibilityDefaults(json.visibility);
     res.json(json);
   } catch (err) {
-    res.status(400).json({ message: 'Failed to update settings', error: err.message });
+    res
+      .status(400)
+      .json({ message: "Failed to update settings", error: err.message });
   }
 }
 
@@ -166,8 +174,8 @@ export async function updateSettings(req, res) {
 export async function updateVisibility(req, res) {
   try {
     const { visibility } = req.body;
-    if (!visibility || typeof visibility !== 'object') {
-      return res.status(400).json({ message: 'visibility object is required' });
+    if (!visibility || typeof visibility !== "object") {
+      return res.status(400).json({ message: "visibility object is required" });
     }
     const settings = await getOrCreateSettings();
     const current = settings.visibility || {};
@@ -177,7 +185,9 @@ export async function updateVisibility(req, res) {
     for (const [pageKey, pageVal] of Object.entries(visibility)) {
       next[pageKey] = {
         pageEnabled:
-          typeof pageVal.pageEnabled === 'boolean' ? pageVal.pageEnabled : next[pageKey]?.pageEnabled ?? true,
+          typeof pageVal.pageEnabled === "boolean"
+            ? pageVal.pageEnabled
+            : (next[pageKey]?.pageEnabled ?? true),
         sections: {
           ...(next[pageKey]?.sections || {}),
           ...(pageVal.sections || {}),
@@ -186,13 +196,15 @@ export async function updateVisibility(req, res) {
     }
 
     settings.visibility = next;
-    settings.markModified('visibility');
+    settings.markModified("visibility");
     await settings.save();
 
     const json = settings.toObject();
     json.visibility = withVisibilityDefaults(json.visibility);
     res.json(json);
   } catch (err) {
-    res.status(400).json({ message: 'Failed to update visibility', error: err.message });
+    res
+      .status(400)
+      .json({ message: "Failed to update visibility", error: err.message });
   }
 }

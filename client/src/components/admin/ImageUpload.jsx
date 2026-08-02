@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react';
-import { UploadCloud, X, Loader2, ImageOff } from 'lucide-react';
-import { uploadImage, resolveImageUrl } from '../../api/client';
+import { useRef, useState } from "react";
+import { UploadCloud, X, Loader2, ImageOff } from "lucide-react";
+import { uploadImage, resolveImageUrl } from "../../api/client";
 
 /**
  * Device image upload widget.
@@ -13,28 +13,35 @@ import { uploadImage, resolveImageUrl } from '../../api/client';
  *  - aspect: tailwind aspect-ratio class for the preview box (default 'aspect-video')
  *  - shape: 'square' | 'circle' | 'video' — quick preset for common use cases (photo vs banner)
  */
-export default function ImageUpload({ value, onChange, label, hint, shape = 'video' }) {
+export default function ImageUpload({
+  value,
+  onChange,
+  label,
+  hint,
+  shape = "video",
+}) {
   const inputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [dragOver, setDragOver] = useState(false);
 
-  const aspectCls = shape === 'square' || shape === 'circle' ? 'aspect-square' : 'aspect-video';
-  const shapeCls = shape === 'circle' ? 'rounded-full' : 'rounded-xl';
+  const aspectCls =
+    shape === "square" || shape === "circle" ? "aspect-square" : "aspect-video";
+  const shapeCls = shape === "circle" ? "rounded-full" : "rounded-xl";
 
   async function handleFile(file) {
     if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      setError('Please choose an image file');
+    if (!file.type.startsWith("image/")) {
+      setError("Please choose an image file");
       return;
     }
-    setError('');
+    setError("");
     setUploading(true);
     try {
       const result = await uploadImage(file);
       onChange(result.url);
     } catch (err) {
-      setError(err.message || 'Upload failed');
+      setError(err.message || "Upload failed");
     } finally {
       setUploading(false);
     }
@@ -42,7 +49,7 @@ export default function ImageUpload({ value, onChange, label, hint, shape = 'vid
 
   function handleInputChange(e) {
     handleFile(e.target.files?.[0]);
-    e.target.value = '';
+    e.target.value = "";
   }
 
   function handleDrop(e) {
@@ -53,7 +60,11 @@ export default function ImageUpload({ value, onChange, label, hint, shape = 'vid
 
   return (
     <div>
-      {label && <span className="block text-sm font-medium text-navy-700 mb-1">{label}</span>}
+      {label && (
+        <span className="block text-sm font-medium text-navy-700 mb-1">
+          {label}
+        </span>
+      )}
       <div
         onDragOver={(e) => {
           e.preventDefault();
@@ -62,12 +73,20 @@ export default function ImageUpload({ value, onChange, label, hint, shape = 'vid
         onDragLeave={() => setDragOver(false)}
         onDrop={handleDrop}
         className={`relative overflow-hidden border-2 border-dashed transition-colors ${shapeCls} ${
-          value ? 'border-transparent' : dragOver ? 'border-marigold-400 bg-marigold-50' : 'border-navy-200 bg-navy-50'
-        } ${shape === 'circle' ? 'w-28 h-28' : `w-full ${aspectCls} max-w-sm`}`}
+          value
+            ? "border-transparent"
+            : dragOver
+              ? "border-marigold-400 bg-marigold-50"
+              : "border-navy-200 bg-navy-50"
+        } ${shape === "circle" ? "w-28 h-28" : `w-full ${aspectCls} max-w-sm`}`}
       >
         {value ? (
           <>
-            <img src={resolveImageUrl(value)} alt="" className="w-full h-full object-cover" />
+            <img
+              src={resolveImageUrl(value)}
+              alt=""
+              className="w-full h-full object-cover"
+            />
             <div className="absolute inset-0 bg-navy-950/0 hover:bg-navy-950/40 transition-colors flex items-center justify-center gap-2 opacity-0 hover:opacity-100">
               <button
                 type="button"
@@ -79,7 +98,7 @@ export default function ImageUpload({ value, onChange, label, hint, shape = 'vid
               </button>
               <button
                 type="button"
-                onClick={() => onChange('')}
+                onClick={() => onChange("")}
                 className="p-2 rounded-full bg-white/90 text-red-600 hover:bg-white"
                 title="Remove image"
               >
@@ -95,13 +114,13 @@ export default function ImageUpload({ value, onChange, label, hint, shape = 'vid
           >
             {uploading ? (
               <Loader2 size={22} className="animate-spin" />
-            ) : shape === 'circle' ? (
+            ) : shape === "circle" ? (
               <ImageOff size={20} />
             ) : (
               <UploadCloud size={22} />
             )}
             <span className="text-xs font-medium px-2 text-center">
-              {uploading ? 'Uploading…' : 'Click or drag an image here'}
+              {uploading ? "Uploading…" : "Click or drag an image here"}
             </span>
           </button>
         )}
@@ -111,9 +130,19 @@ export default function ImageUpload({ value, onChange, label, hint, shape = 'vid
           </div>
         )}
       </div>
-      <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handleInputChange} />
-      {hint && !error && <span className="block text-xs text-navy-400 mt-1">{hint}</span>}
-      {error && <span className="block text-xs text-red-500 mt-1">{error}</span>}
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleInputChange}
+      />
+      {hint && !error && (
+        <span className="block text-xs text-navy-400 mt-1">{hint}</span>
+      )}
+      {error && (
+        <span className="block text-xs text-red-500 mt-1">{error}</span>
+      )}
     </div>
   );
 }

@@ -1,11 +1,11 @@
 // models/Blog.js
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const blogSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: [true, 'Blog title is required'],
+      required: [true, "Blog title is required"],
       trim: true,
     },
     slug: {
@@ -16,30 +16,30 @@ const blogSchema = new mongoose.Schema(
     },
     excerpt: {
       type: String,
-      required: [true, 'Excerpt is required'],
+      required: [true, "Excerpt is required"],
     },
     content: {
       type: String,
-      required: [true, 'Content is required'],
+      required: [true, "Content is required"],
     },
     category: {
       type: String,
-      default: 'General',
+      default: "General",
     },
     author: {
       type: String,
-      default: 'Department of Computer Science',
+      default: "Department of Computer Science",
     },
     imageUrl: {
       type: String,
-      default: '',
+      default: "",
     },
     published: {
       type: Boolean,
       default: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-export default mongoose.model('Blog', blogSchema);
+export default mongoose.model("Blog", blogSchema);

@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { useSettings } from '../context/SettingsContext';
+import { useEffect, useRef, useState } from "react";
+import { useSettings } from "../context/SettingsContext";
 
 function useCountUp(target, active) {
   const [value, setValue] = useState(0);
@@ -35,7 +35,7 @@ function Metric({ label, value, suffix }) {
       ([entry]) => {
         if (entry.isIntersecting) setActive(true);
       },
-      { threshold: 0.4 }
+      { threshold: 0.4 },
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -45,9 +45,11 @@ function Metric({ label, value, suffix }) {
     <div ref={ref} className="text-center sm:text-left">
       <p className="font-mono text-3xl sm:text-4xl font-semibold text-navy dark:text-marigold-200">
         {count.toLocaleString()}
-        {suffix || ''}
+        {suffix || ""}
       </p>
-      <p className="text-xs sm:text-sm text-navy-400 dark:text-navy-200 mt-1">{label}</p>
+      <p className="text-xs sm:text-sm text-navy-400 dark:text-navy-200 mt-1">
+        {label}
+      </p>
     </div>
   );
 }

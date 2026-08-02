@@ -63,7 +63,11 @@ const navGroups = [
     items: [
       { to: "/admin/events", label: "Events", icon: CalendarDays },
       { to: "/admin/testimonials", label: "Testimonials", icon: Quote },
-      { to: "/admin/placement-partners", label: "Placement Partners", icon: Handshake },
+      {
+        to: "/admin/placement-partners",
+        label: "Placement Partners",
+        icon: Handshake,
+      },
     ],
   },
   {

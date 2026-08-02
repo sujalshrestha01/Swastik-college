@@ -1,15 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { Calendar, Tag, Eye, X, ChevronLeft, ChevronRight, Images } from 'lucide-react';
-import { getGalleryEvents, resolveImageUrl } from '../api/client';
-import { Section } from '../components/Visibility';
+import React, { useEffect, useState } from "react";
+import {
+  Calendar,
+  Tag,
+  Eye,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Images,
+} from "lucide-react";
+import { getGalleryEvents, resolveImageUrl } from "../api/client";
+import { Section } from "../components/Visibility";
 
-const CATEGORIES = ['All', 'Events', 'Academics', 'Sports', 'Campus'];
-
+const CATEGORIES = ["All", "Events", "Academics", "Sports", "Campus"];
 
 export default function Gallery() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
   // State for active lightbox modal & active image carousel index
   const [activeEvent, setActiveEvent] = useState(null);
@@ -23,10 +30,14 @@ export default function Gallery() {
   }, []);
 
   const filteredEvents =
-    selectedCategory === 'All' ? events : events.filter((item) => item.category === selectedCategory);
+    selectedCategory === "All"
+      ? events
+      : events.filter((item) => item.category === selectedCategory);
 
   const thumbnailIndexOf = (event) => {
-    const idx = event.images?.findIndex((img) => String(img._id) === String(event.thumbnailId));
+    const idx = event.images?.findIndex(
+      (img) => String(img._id) === String(event.thumbnailId),
+    );
     return idx && idx > -1 ? idx : 0;
   };
 
@@ -48,27 +59,27 @@ export default function Gallery() {
   const prevImage = () => {
     if (!activeEvent) return;
     setCurrentImageIndex((prev) =>
-      prev === 0 ? activeEvent.images.length - 1 : prev - 1
+      prev === 0 ? activeEvent.images.length - 1 : prev - 1,
     );
   };
 
   return (
     <section className="py-16 bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        
         {/* Header */}
         <Section page="gallery" section="hero">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="font-mono text-xs tracking-[0.2em] text-[#D9383A] dark:text-[#3B82F6] font-semibold uppercase">
-            College Life &amp; Events
-          </span>
-          <h1 className="font-display text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mt-2">
-            College Photo Gallery
-          </h1>
-          <p className="mt-3 text-slate-600 dark:text-slate-300 text-sm sm:text-base">
-            Explore photo albums from our academic activities, events, and student achievements.
-          </p>
-        </div>
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <span className="font-mono text-xs tracking-[0.2em] text-[#D9383A] dark:text-[#3B82F6] font-semibold uppercase">
+              College Life &amp; Events
+            </span>
+            <h1 className="font-display text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mt-2">
+              College Photo Gallery
+            </h1>
+            <p className="mt-3 text-slate-600 dark:text-slate-300 text-sm sm:text-base">
+              Explore photo albums from our academic activities, events, and
+              student achievements.
+            </p>
+          </div>
         </Section>
 
         {/* Category Filter Tabs */}
@@ -79,8 +90,8 @@ export default function Gallery() {
               onClick={() => setSelectedCategory(category)}
               className={`px-5 py-2 rounded-full text-xs font-semibold tracking-wider transition-all duration-300 cursor-pointer ${
                 selectedCategory === category
-                  ? 'bg-[#1E3A8A] text-white shadow-md scale-105'
-                  : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:border-[#D9383A] border border-slate-200 dark:border-slate-800 shadow-sm'
+                  ? "bg-[#1E3A8A] text-white shadow-md scale-105"
+                  : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:border-[#D9383A] border border-slate-200 dark:border-slate-800 shadow-sm"
               }`}
             >
               {category}
@@ -90,74 +101,83 @@ export default function Gallery() {
 
         {/* Gallery Grid */}
         <Section page="gallery" section="grid">
-        {loading ? (
-          <p className="text-center text-sm text-slate-400 py-12">Loading gallery…</p>
-        ) : filteredEvents.length === 0 ? (
-          <p className="text-center text-sm text-slate-400 py-12">No photos here yet — check back soon.</p>
-        ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredEvents.map((event) => {
-            const coverImage = event.images[thumbnailIndexOf(event)] || event.images[0];
-            return (
-              <div
-                key={event._id}
-                onClick={() => openLightbox(event)}
-                className="group relative bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl overflow-hidden cursor-pointer hover:border-b-2 hover:border-b-[#D9383A] transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1"
-              >
-                {/* Thumbnail Cover Image Box */}
-                <div className="relative aspect-video bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                  <img
-                    src={resolveImageUrl(coverImage.url)}
-                    alt={event.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
-                  />
+          {loading ? (
+            <p className="text-center text-sm text-slate-400 py-12">
+              Loading gallery…
+            </p>
+          ) : filteredEvents.length === 0 ? (
+            <p className="text-center text-sm text-slate-400 py-12">
+              No photos here yet — check back soon.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredEvents.map((event) => {
+                const coverImage =
+                  event.images[thumbnailIndexOf(event)] || event.images[0];
+                return (
+                  <div
+                    key={event._id}
+                    onClick={() => openLightbox(event)}
+                    className="group relative bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl overflow-hidden cursor-pointer hover:border-b-2 hover:border-b-[#D9383A] transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1"
+                  >
+                    {/* Thumbnail Cover Image Box */}
+                    <div className="relative aspect-video bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                      <img
+                        src={resolveImageUrl(coverImage.url)}
+                        alt={event.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                      />
 
-                  {/* Photo Count Pill */}
-                  <div className="absolute top-3 right-3 bg-slate-950/70 backdrop-blur-md text-white font-mono text-xs px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-md">
-                    <Images size={13} />
-                    <span>{event.images.length} Photos</span>
+                      {/* Photo Count Pill */}
+                      <div className="absolute top-3 right-3 bg-slate-950/70 backdrop-blur-md text-white font-mono text-xs px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-md">
+                        <Images size={13} />
+                        <span>{event.images.length} Photos</span>
+                      </div>
+
+                      {/* Hover Overlay */}
+                      <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <span className="inline-flex items-center gap-1.5 px-4 py-2 bg-white text-slate-900 text-xs font-bold rounded-full shadow-md">
+                          <Eye size={14} /> View Album
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Card Info Content */}
+                    <div className="p-5">
+                      <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-2 font-mono">
+                        <span className="inline-flex items-center gap-1 text-[#D9383A] font-medium">
+                          <Tag size={12} /> {event.category}
+                        </span>
+                        <span className="inline-flex items-center gap-1">
+                          <Calendar size={12} />{" "}
+                          {new Date(event.date).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })}
+                        </span>
+                      </div>
+
+                      <h3 className="font-display font-bold text-lg text-[#1E3A8A] dark:text-blue-400 group-hover:text-[#D9383A] transition-colors line-clamp-1">
+                        {event.title}
+                      </h3>
+
+                      <p className="mt-2 text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed">
+                        {event.description}
+                      </p>
+                    </div>
                   </div>
-
-                  {/* Hover Overlay */}
-                  <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <span className="inline-flex items-center gap-1.5 px-4 py-2 bg-white text-slate-900 text-xs font-bold rounded-full shadow-md">
-                      <Eye size={14} /> View Album
-                    </span>
-                  </div>
-                </div>
-
-                {/* Card Info Content */}
-                <div className="p-5">
-                  <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-2 font-mono">
-                    <span className="inline-flex items-center gap-1 text-[#D9383A] font-medium">
-                      <Tag size={12} /> {event.category}
-                    </span>
-                    <span className="inline-flex items-center gap-1">
-                      <Calendar size={12} /> {new Date(event.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-                    </span>
-                  </div>
-
-                  <h3 className="font-display font-bold text-lg text-[#1E3A8A] dark:text-blue-400 group-hover:text-[#D9383A] transition-colors line-clamp-1">
-                    {event.title}
-                  </h3>
-
-                  <p className="mt-2 text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed">
-                    {event.description}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        )}
+                );
+              })}
+            </div>
+          )}
         </Section>
 
         {/* Multi-Image Album Lightbox Modal */}
         {activeEvent && (
           <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
             <div className="relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl max-w-4xl w-full overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
-              
               {/* Modal Header Bar */}
               <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-900">
                 <div>
@@ -166,7 +186,8 @@ export default function Gallery() {
                       {activeEvent.category}
                     </span>
                     <span className="flex items-center gap-1">
-                      <Calendar size={13} /> {new Date(activeEvent.date).toLocaleDateString()}
+                      <Calendar size={13} />{" "}
+                      {new Date(activeEvent.date).toLocaleDateString()}
                     </span>
                   </div>
                   <h3 className="font-display text-xl sm:text-2xl font-bold text-[#1E3A8A] dark:text-blue-400">
@@ -186,8 +207,13 @@ export default function Gallery() {
               {/* Main Carousel Viewer */}
               <div className="relative bg-slate-950 aspect-video flex items-center justify-center overflow-hidden group">
                 <img
-                  src={resolveImageUrl(activeEvent.images[currentImageIndex]?.url)}
-                  alt={activeEvent.images[currentImageIndex]?.caption || activeEvent.title}
+                  src={resolveImageUrl(
+                    activeEvent.images[currentImageIndex]?.url,
+                  )}
+                  alt={
+                    activeEvent.images[currentImageIndex]?.caption ||
+                    activeEvent.title
+                  }
                   className="w-full h-full object-contain"
                 />
 
@@ -212,7 +238,8 @@ export default function Gallery() {
                 {/* Image Counter & Caption Overlay */}
                 <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-xs text-slate-200 bg-slate-950/70 backdrop-blur-md px-4 py-2 rounded-xl border border-slate-800 font-mono">
                   <span className="truncate pr-4">
-                    {activeEvent.images[currentImageIndex]?.caption || activeEvent.description}
+                    {activeEvent.images[currentImageIndex]?.caption ||
+                      activeEvent.description}
                   </span>
                   <span className="shrink-0 text-[#D9383A] font-bold">
                     {currentImageIndex + 1} / {activeEvent.images.length}
@@ -229,8 +256,8 @@ export default function Gallery() {
                       onClick={() => setCurrentImageIndex(idx)}
                       className={`relative w-20 h-14 rounded-lg overflow-hidden shrink-0 border-2 transition-all cursor-pointer ${
                         currentImageIndex === idx
-                          ? 'border-[#D9383A] scale-105 shadow-md'
-                          : 'border-transparent opacity-60 hover:opacity-100'
+                          ? "border-[#D9383A] scale-105 shadow-md"
+                          : "border-transparent opacity-60 hover:opacity-100"
                       }`}
                     >
                       <img
@@ -249,11 +276,9 @@ export default function Gallery() {
                   {activeEvent.description}
                 </p>
               </div>
-
             </div>
           </div>
         )}
-
       </div>
     </section>
   );

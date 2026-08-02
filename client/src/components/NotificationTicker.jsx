@@ -1,5 +1,5 @@
-import { Terminal, Mail, Phone, Clock } from 'lucide-react';
-import { useSettings } from '../context/SettingsContext';
+import { Terminal, Mail, Phone, Clock } from "lucide-react";
+import { useSettings } from "../context/SettingsContext";
 
 export default function NotificationTicker() {
   const { settings } = useSettings();
@@ -8,9 +8,9 @@ export default function NotificationTicker() {
     settings?.announcementBarEnabled && settings?.announcementBarText;
 
   // Fallback values from settings or standard defaults
-  const contactEmail = settings?.email || 'info@swastikcollege.edu.np';
-  const contactPhone = settings?.phone || '+977-1-6635174';
-  const officeHours = settings?.officeHours || 'Sun - Fri 6:30 A.M - 1:00 P.M';
+  const contactEmail = settings?.email || "info@swastikcollege.edu.np";
+  const contactPhone = settings?.phone || "+977-1-6635174";
+  const officeHours = settings?.officeHours || "Sun - Fri 6:30 A.M - 1:00 P.M";
 
   // 1. Dark Terminal Alert Bar (When Announcement is Active)
   if (isAnnouncementActive) {
@@ -45,36 +45,36 @@ export default function NotificationTicker() {
   }
 
   // 2. Official Swastik Red Contact Info Bar (Responsive Fix)
- return (
-  <div className="bg-[#D9383A] dark:bg-navy-900/90 dark:border-b-2 dark:border-gray-700 text-white dark:text-navy-100 py-1.5 px-3 sm:px-6 text-[11px] sm:text-xs font-medium transition-colors duration-300">
-    <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
-      {/* Contact Items */}
-      <div className="flex items-center gap-3 sm:gap-5 min-w-0">
-        {/* Email: Hidden on extra-small mobile screens to save space */}
-        <a
-          href={`mailto:${contactEmail}`}
-          className="hidden sm:flex items-center gap-1.5 hover:underline truncate"
-        >
-          <Mail size={12} className="shrink-0" />
-          <span className="truncate">{contactEmail}</span>
-        </a>
+  return (
+    <div className="bg-[#D9383A] dark:bg-navy-900/90 dark:border-b-2 dark:border-gray-700 text-white dark:text-navy-100 py-1.5 px-3 sm:px-6 text-[11px] sm:text-xs font-medium transition-colors duration-300">
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
+        {/* Contact Items */}
+        <div className="flex items-center gap-3 sm:gap-5 min-w-0">
+          {/* Email: Hidden on extra-small mobile screens to save space */}
+          <a
+            href={`mailto:${contactEmail}`}
+            className="hidden sm:flex items-center gap-1.5 hover:underline truncate"
+          >
+            <Mail size={12} className="shrink-0" />
+            <span className="truncate">{contactEmail}</span>
+          </a>
 
-        {/* Phone: Always visible on mobile */}
-        <a
-          href={`tel:${contactPhone.replace(/[^+\d]/g, '')}`}
-          className="flex items-center gap-1.5 hover:underline shrink-0"
-        >
-          <Phone size={12} className="shrink-0" />
-          <span>{contactPhone}</span>
-        </a>
-      </div>
+          {/* Phone: Always visible on mobile */}
+          <a
+            href={`tel:${contactPhone.replace(/[^+\d]/g, "")}`}
+            className="flex items-center gap-1.5 hover:underline shrink-0"
+          >
+            <Phone size={12} className="shrink-0" />
+            <span>{contactPhone}</span>
+          </a>
+        </div>
 
-      {/* Operating Hours: Always single-line on the right */}
-      <div className="flex items-center gap-1.5 shrink-0 text-slate-100 dark:text-navy-200">
-        <Clock size={12} className="shrink-0" />
-        <span className="whitespace-nowrap">{officeHours}</span>
+        {/* Operating Hours: Always single-line on the right */}
+        <div className="flex items-center gap-1.5 shrink-0 text-slate-100 dark:text-navy-200">
+          <Clock size={12} className="shrink-0" />
+          <span className="whitespace-nowrap">{officeHours}</span>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
 }

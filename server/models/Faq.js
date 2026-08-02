@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 // FAQ entries shown in the public "Chat with Admissions" quick-action
 // widget. Clicking a question shows this canned answer instantly — no
@@ -11,7 +11,7 @@ const faqSchema = new mongoose.Schema(
     answer: { type: String, required: true },
     order: { type: Number, default: 0 },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-export default mongoose.model('Faq', faqSchema);
+export default mongoose.model("Faq", faqSchema);

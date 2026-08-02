@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import aboutus1 from '../../assets/aboutus1.jpg';
+import { useEffect, useState } from "react";
+import aboutus1 from "../../assets/aboutus1.jpg";
 import {
   ArrowRight,
   BookOpenCheck,
@@ -16,22 +16,33 @@ import {
   Users,
   Eye,
   ChevronRight,
-} from 'lucide-react';
-import { Link } from 'react-router';
-import { useSettings } from '../context/SettingsContext';
-import { getGalleryEvents, resolveImageUrl } from '../api/client';
-import { Section } from '../components/Visibility';
-import Testimonials from '../components/Testimonials';
+} from "lucide-react";
+import { Link } from "react-router";
+import { useSettings } from "../context/SettingsContext";
+import { getGalleryEvents, resolveImageUrl } from "../api/client";
+import { Section } from "../components/Visibility";
+import Testimonials from "../components/Testimonials";
 
 // Maps icon name from database to Lucide React component
-const ICON_MAP = { GraduationCap, Users, Lightbulb, HeartHandshake, Trophy, Target, Compass, BookOpenCheck };
+const ICON_MAP = {
+  GraduationCap,
+  Users,
+  Lightbulb,
+  HeartHandshake,
+  Trophy,
+  Target,
+  Compass,
+  BookOpenCheck,
+};
 
 // Color classes mapped per key with dark-mode optimized gradients and borders
 const COLOR_MAP = {
-  blue: 'from-blue-500/10 via-indigo-500/5 to-transparent border-blue-500/20 dark:border-blue-500/30 text-blue-600 dark:text-blue-400 dark:hover:border-blue-400/50',
-  emerald: 'from-emerald-500/10 via-teal-500/5 to-transparent border-emerald-500/20 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 dark:hover:border-emerald-400/50',
-  amber: 'from-amber-500/10 via-orange-500/5 to-transparent border-amber-500/20 dark:border-amber-500/30 text-amber-600 dark:text-amber-400 dark:hover:border-amber-400/50',
-  rose: 'from-rose-500/10 via-pink-500/5 to-transparent border-rose-500/20 dark:border-rose-500/30 text-rose-600 dark:text-rose-400 dark:hover:border-rose-400/50',
+  blue: "from-blue-500/10 via-indigo-500/5 to-transparent border-blue-500/20 dark:border-blue-500/30 text-blue-600 dark:text-blue-400 dark:hover:border-blue-400/50",
+  emerald:
+    "from-emerald-500/10 via-teal-500/5 to-transparent border-emerald-500/20 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 dark:hover:border-emerald-400/50",
+  amber:
+    "from-amber-500/10 via-orange-500/5 to-transparent border-amber-500/20 dark:border-amber-500/30 text-amber-600 dark:text-amber-400 dark:hover:border-amber-400/50",
+  rose: "from-rose-500/10 via-pink-500/5 to-transparent border-rose-500/20 dark:border-rose-500/30 text-rose-600 dark:text-rose-400 dark:hover:border-rose-400/50",
 };
 
 export default function About() {
@@ -39,16 +50,19 @@ export default function About() {
   const [galleryImages, setGalleryImages] = useState([]);
 
   useEffect(() => {
-    getGalleryEvents().then((events) => setGalleryImages((events || []).slice(0, 6)));
+    getGalleryEvents().then((events) =>
+      setGalleryImages((events || []).slice(0, 6)),
+    );
   }, []);
 
-  const timeline = settings.about?.timeline?.length ? settings.about.timeline : [];
+  const timeline = settings.about?.timeline?.length
+    ? settings.about.timeline
+    : [];
   const values = settings.about?.values?.length ? settings.about.values : [];
   const leadership = settings.about?.leadership || {};
 
   return (
     <div className="bg-slate-50 dark:bg-slate-950 min-h-screen text-slate-800 dark:text-slate-100 transition-colors duration-300">
-      
       {/* ------------------------------------------------------------------ */}
       {/* 1. HERO SECTION                                                    */}
       {/* ------------------------------------------------------------------ */}
@@ -56,12 +70,11 @@ export default function About() {
         <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-28">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="grid lg:grid-cols-12 gap-12 items-center">
-              
               {/* Left Header Copy */}
               <div className="lg:col-span-7 space-y-6">
                 <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-red-500/10 dark:bg-teal-500/10 border border-red-500/20 dark:border-teal-500/30 text-red-600 dark:text-teal-400 text-xs font-semibold tracking-wider uppercase">
                   <Sparkles size={14} />
-                  <span>About {settings.collegeName || 'Our Institution'}</span>
+                  <span>About {settings.collegeName || "Our Institution"}</span>
                 </div>
 
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.15]">
@@ -77,7 +90,7 @@ export default function About() {
 
                 <p className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
                   {settings.aboutSummary ||
-                    'Dedicated to delivering academic excellence, research-driven learning, and holistic personality development. We prepare students for dynamic careers in technology, management, and global leadership.'}
+                    "Dedicated to delivering academic excellence, research-driven learning, and holistic personality development. We prepare students for dynamic careers in technology, management, and global leadership."}
                 </p>
 
                 <div className="flex flex-wrap items-center gap-4 pt-2">
@@ -106,22 +119,22 @@ export default function About() {
                     className="w-full h-[450px] object-cover group-hover:scale-105 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
-                  
+
                   {/* Floating Info Pill */}
                   <div className="absolute bottom-6 left-6 right-6 p-4 rounded-2xl bg-white/80 dark:bg-slate-900/90 backdrop-blur-md border border-white/20 dark:border-slate-700/60 shadow-lg">
                     <p className="text-xs font-mono uppercase tracking-wider text-teal-600 dark:text-teal-400 font-semibold">
                       Affiliation & Legacy
                     </p>
                     <p className="text-sm font-semibold text-slate-800 dark:text-white mt-1">
-                      {settings.affiliation || 'Tribhuvan University Affiliated'}
+                      {settings.affiliation ||
+                        "Tribhuvan University Affiliated"}
                     </p>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Est. {settings.establishedYear || '2005'}
+                      Est. {settings.establishedYear || "2005"}
                     </p>
                   </div>
                 </div>
               </div>
-
             </div>
           </div>
         </section>
@@ -137,7 +150,8 @@ export default function About() {
               Our Purpose & Direction
             </h2>
             <p className="text-slate-600 dark:text-slate-400 mt-2">
-              Guided by a clear roadmap to empower future professionals and visionary thinkers.
+              Guided by a clear roadmap to empower future professionals and
+              visionary thinkers.
             </p>
           </div>
 
@@ -152,7 +166,7 @@ export default function About() {
               </h3>
               <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                 {settings.missionStatement ||
-                  'To provide transformative higher education combining technical excellence, research capability, and ethical foundation. We aim to equip students with critical skills needed to thrive in modern global careers.'}
+                  "To provide transformative higher education combining technical excellence, research capability, and ethical foundation. We aim to equip students with critical skills needed to thrive in modern global careers."}
               </p>
             </div>
 
@@ -166,7 +180,7 @@ export default function About() {
               </h3>
               <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                 {settings.visionStatement ||
-                  'To be recognized as a premier educational landmark that inspires creative thinking, technological innovation, and sustainable leadership across diverse discipline boundaries.'}
+                  "To be recognized as a premier educational landmark that inspires creative thinking, technological innovation, and sustainable leadership across diverse discipline boundaries."}
               </p>
             </div>
           </div>
@@ -184,7 +198,8 @@ export default function About() {
                 What Sets Us Apart
               </h2>
               <p className="text-slate-500 dark:text-slate-400 mt-2">
-                The foundational pillars that define student life and academic learning on our campus.
+                The foundational pillars that define student life and academic
+                learning on our campus.
               </p>
             </div>
 
@@ -220,9 +235,12 @@ export default function About() {
       <Section page="about" section="journey">
         <section className="py-20 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Our Journey</h2>
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-white">
+              Our Journey
+            </h2>
             <p className="text-slate-500 dark:text-slate-400 mt-2">
-              How we evolved from a modest initiative into an academic destination.
+              How we evolved from a modest initiative into an academic
+              destination.
             </p>
           </div>
 
@@ -258,7 +276,10 @@ export default function About() {
       <Section page="about" section="leadership">
         <section className="py-16 bg-slate-900 dark:bg-slate-900/90 border-y border-slate-800 text-white relative overflow-hidden">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center relative z-10">
-            <Quote size={40} className="mx-auto text-teal-400 opacity-80 mb-6" />
+            <Quote
+              size={40}
+              className="mx-auto text-teal-400 opacity-80 mb-6"
+            />
             <p className="text-xl sm:text-2xl font-medium leading-relaxed italic text-slate-200">
               "{leadership.text}"
             </p>
@@ -267,7 +288,7 @@ export default function About() {
                 {leadership.author}
               </h4>
               <p className="text-xs text-teal-400 tracking-wider uppercase mt-0.5 font-medium">
-                {leadership.role} — {settings.collegeName || 'Our College'}
+                {leadership.role} — {settings.collegeName || "Our College"}
               </p>
             </div>
           </div>
@@ -282,7 +303,9 @@ export default function About() {
           <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
               <div>
-                <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Campus Life</h2>
+                <h2 className="text-3xl font-bold text-slate-900 dark:text-white">
+                  Campus Life
+                </h2>
                 <p className="text-slate-500 dark:text-slate-400 mt-1">
                   A glimpse into our campus culture, facilities, and activities.
                 </p>
@@ -303,14 +326,16 @@ export default function About() {
                   className="group relative rounded-2xl overflow-hidden aspect-video sm:aspect-square bg-slate-200 dark:bg-slate-800 border border-slate-200/60 dark:border-slate-800 block shadow-xs hover:shadow-lg dark:hover:shadow-slate-950/60 transition-all"
                 >
                   <img
-                    src={resolveImageUrl(event.thumbnailUrl || event.images?.[0]?.url)}
-                    alt={event.title || 'Campus Shot'}
+                    src={resolveImageUrl(
+                      event.thumbnailUrl || event.images?.[0]?.url,
+                    )}
+                    alt={event.title || "Campus Shot"}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     loading="lazy"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
                     <p className="text-white text-xs font-medium truncate">
-                      {event.title || 'Campus View'}
+                      {event.title || "Campus View"}
                     </p>
                   </div>
                 </Link>
@@ -335,7 +360,8 @@ export default function About() {
               Start Your Journey With Us
             </h2>
             <p className="text-teal-100 text-sm sm:text-base leading-relaxed">
-              Admissions are open for upcoming academic sessions. Connect with our counseling team to choose the right path for your career.
+              Admissions are open for upcoming academic sessions. Connect with
+              our counseling team to choose the right path for your career.
             </p>
           </div>
 
@@ -355,7 +381,6 @@ export default function About() {
           </div>
         </div>
       </section>
-
     </div>
   );
 }

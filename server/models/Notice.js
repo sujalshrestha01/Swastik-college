@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const noticeSchema = new mongoose.Schema(
   {
@@ -6,13 +6,13 @@ const noticeSchema = new mongoose.Schema(
     category: {
       type: String,
       required: true,
-      enum: ['Exams', 'Admissions', 'Events', 'General'],
+      enum: ["Exams", "Admissions", "Events", "General"],
     },
     date: { type: Date, required: true, default: Date.now },
     excerpt: { type: String, required: true },
-    fileUrl: { type: String, default: '' },
+    fileUrl: { type: String, default: "" },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-export default mongoose.model('Notice', noticeSchema);
+export default mongoose.model("Notice", noticeSchema);

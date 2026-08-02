@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router';
-import { ArrowUpRight, Clock, Users, Award } from 'lucide-react';
-import { getCourses } from '../api/client';
-import { Section } from '../components/Visibility';
+import { useEffect, useState } from "react";
+import { Link } from "react-router";
+import { ArrowUpRight, Clock, Users, Award } from "lucide-react";
+import { getCourses } from "../api/client";
+import { Section } from "../components/Visibility";
 
 export default function Programs() {
   const [programs, setPrograms] = useState([]);
@@ -22,7 +22,8 @@ export default function Programs() {
           Academic Programs
         </h1>
         <p className="text-slate-600 dark:text-slate-300 max-w-2xl mb-10 leading-relaxed">
-          TU-affiliated programs, each with semester-wise curriculum and downloadable syllabus.
+          TU-affiliated programs, each with semester-wise curriculum and
+          downloadable syllabus.
         </p>
       </Section>
 
@@ -64,11 +65,17 @@ export default function Programs() {
               {/* Card Footer Details */}
               <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs font-mono text-slate-500 dark:text-slate-400">
                 <span className="flex items-center gap-1.5">
-                  <Clock size={14} className="text-[#1E3A8A] dark:text-blue-400" />
+                  <Clock
+                    size={14}
+                    className="text-[#1E3A8A] dark:text-blue-400"
+                  />
                   {p.duration}
                 </span>
                 <span className="flex items-center gap-1.5">
-                  <Users size={14} className="text-[#1E3A8A] dark:text-blue-400" />
+                  <Users
+                    size={14}
+                    className="text-[#1E3A8A] dark:text-blue-400"
+                  />
                   {p.seats} seats
                 </span>
               </div>
@@ -98,17 +105,24 @@ export default function Programs() {
               </p>
 
               <p className="text-sm text-slate-600 dark:text-slate-300 mt-3 leading-relaxed line-clamp-3">
-                Industry-aligned training programs, hands-on tech workshops, and skill booster certifications running alongside degree courses.
+                Industry-aligned training programs, hands-on tech workshops, and
+                skill booster certifications running alongside degree courses.
               </p>
             </div>
 
             <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs font-mono text-slate-500 dark:text-slate-400">
               <span className="flex items-center gap-1.5">
-                <Clock size={14} className="text-[#1E3A8A] dark:text-blue-400" />
+                <Clock
+                  size={14}
+                  className="text-[#1E3A8A] dark:text-blue-400"
+                />
                 Flexible / Short-term
               </span>
               <span className="flex items-center gap-1.5">
-                <Award size={14} className="text-[#1E3A8A] dark:text-blue-400" />
+                <Award
+                  size={14}
+                  className="text-[#1E3A8A] dark:text-blue-400"
+                />
                 Certified
               </span>
             </div>

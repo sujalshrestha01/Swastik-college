@@ -1,5 +1,5 @@
-import { Navigate } from 'react-router';
-import { useSettings } from '../context/SettingsContext';
+import { Navigate } from "react-router";
+import { useSettings } from "../context/SettingsContext";
 
 /**
  * Wrap any section/component with this to make it toggleable from the admin
@@ -23,7 +23,7 @@ export function Section({ page, section, children }) {
  *
  *   <Route path="/about" element={<PageGate page="about"><About /></PageGate>} />
  */
-export function PageGate({ page, children, redirectTo = '/' }) {
+export function PageGate({ page, children, redirectTo = "/" }) {
   const { isPageEnabled, loading } = useSettings();
   if (loading) return children;
   if (!isPageEnabled(page)) return <Navigate to={redirectTo} replace />;

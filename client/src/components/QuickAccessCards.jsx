@@ -1,12 +1,42 @@
-import { Link } from 'react-router';
-import { Bell, GraduationCap, FileText, ClipboardList, ArrowUpRight } from 'lucide-react';
-import { useSettings } from '../context/SettingsContext';
+import { Link } from "react-router";
+import {
+  Bell,
+  GraduationCap,
+  FileText,
+  ClipboardList,
+  ArrowUpRight,
+} from "lucide-react";
+import { useSettings } from "../context/SettingsContext";
 
 const CARDS = [
-  { icon: Bell, title: 'Notice Board', desc: 'Exam routines, admissions & college alerts', to: '/notices', page: 'notices' },
-  { icon: GraduationCap, title: 'Courses', desc: 'BSc. CSIT and BCA programs', to: '/programs', page: 'programs' },
-  { icon: FileText, title: 'Syllabus', desc: 'Semester-wise curriculum, downloadable', to: '/programs', page: 'programs' },
-  { icon: ClipboardList, title: 'Admissions', desc: 'Eligibility, forms and deadlines', to: '/contact', page: 'contact' },
+  {
+    icon: Bell,
+    title: "Notice Board",
+    desc: "Exam routines, admissions & college alerts",
+    to: "/notices",
+    page: "notices",
+  },
+  {
+    icon: GraduationCap,
+    title: "Courses",
+    desc: "BSc. CSIT and BCA programs",
+    to: "/programs",
+    page: "programs",
+  },
+  {
+    icon: FileText,
+    title: "Syllabus",
+    desc: "Semester-wise curriculum, downloadable",
+    to: "/programs",
+    page: "programs",
+  },
+  {
+    icon: ClipboardList,
+    title: "Admissions",
+    desc: "Eligibility, forms and deadlines",
+    to: "/contact",
+    page: "contact",
+  },
 ];
 
 export default function QuickAccessCards() {
@@ -30,9 +60,14 @@ export default function QuickAccessCards() {
               <h3 className="font-semibold text-slate-900 dark:text-white text-sm sm:text-base group-hover:text-[#1E3A8A] dark:group-hover:text-blue-400 transition-colors">
                 {title}
               </h3>
-              <ArrowUpRight size={15} className="text-slate-400 group-hover:text-[#1E3A8A] dark:group-hover:text-blue-400 transition-colors" />
+              <ArrowUpRight
+                size={15}
+                className="text-slate-400 group-hover:text-[#1E3A8A] dark:group-hover:text-blue-400 transition-colors"
+              />
             </div>
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1.5">{desc}</p>
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1.5">
+              {desc}
+            </p>
           </Link>
         ))}
       </div>

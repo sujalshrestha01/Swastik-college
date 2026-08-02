@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 // Multiple downloadable resources shown in the navbar "Downloads" dropdown —
 // e.g. Model Question, Past Question, Prospectus, Fee Structure. Each item is
@@ -8,13 +8,20 @@ const downloadSchema = new mongoose.Schema(
     title: { type: String, required: true, trim: true },
     category: {
       type: String,
-      default: 'General',
-      enum: ['Model Question', 'Past Question', 'Syllabus', 'Notice', 'Form', 'General'],
+      default: "General",
+      enum: [
+        "Model Question",
+        "Past Question",
+        "Syllabus",
+        "Notice",
+        "Form",
+        "General",
+      ],
     },
     fileUrl: { type: String, required: true },
     order: { type: Number, default: 0 }, // lower shows first
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-export default mongoose.model('Download', downloadSchema);
+export default mongoose.model("Download", downloadSchema);

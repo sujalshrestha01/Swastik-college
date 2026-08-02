@@ -1,15 +1,28 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Search, Download as DownloadIcon, FileText, FolderDown } from 'lucide-react';
-import { getDownloads, resolveImageUrl } from '../api/client';
-import { Section } from '../components/Visibility';
-import { PdfThumbnail } from '../components/PdfThumbnail';
+import { useEffect, useMemo, useState } from "react";
+import {
+  Search,
+  Download as DownloadIcon,
+  FileText,
+  FolderDown,
+} from "lucide-react";
+import { getDownloads, resolveImageUrl } from "../api/client";
+import { Section } from "../components/Visibility";
+import { PdfThumbnail } from "../components/PdfThumbnail";
 
-const CATEGORIES = ['All', 'Model Question', 'Past Question', 'Syllabus', 'Notice', 'Form', 'General'];
+const CATEGORIES = [
+  "All",
+  "Model Question",
+  "Past Question",
+  "Syllabus",
+  "Notice",
+  "Form",
+  "General",
+];
 
 export default function Downloads() {
   const [items, setItems] = useState([]);
-  const [query, setQuery] = useState('');
-  const [category, setCategory] = useState('All');
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("All");
 
   useEffect(() => {
     getDownloads().then(setItems);
@@ -17,9 +30,17 @@ export default function Downloads() {
 
   const filtered = useMemo(() => {
     return items
-      .filter((d) => (category === 'All' ? true : d.category === category))
-      .filter((d) => (query.trim() === '' ? true : d.title.toLowerCase().includes(query.toLowerCase())))
-      .sort((a, b) => (a.order || 0) - (b.order || 0) || new Date(b.createdAt) - new Date(a.createdAt));
+      .filter((d) => (category === "All" ? true : d.category === category))
+      .filter((d) =>
+        query.trim() === ""
+          ? true
+          : d.title.toLowerCase().includes(query.toLowerCase()),
+      )
+      .sort(
+        (a, b) =>
+          (a.order || 0) - (b.order || 0) ||
+          new Date(b.createdAt) - new Date(a.createdAt),
+      );
   }, [items, query, category]);
 
   return (
@@ -27,7 +48,9 @@ export default function Downloads() {
       <Section page="downloads" section="hero">
         <div className="flex items-center gap-2 mb-2 text-[#D9383A] dark:text-[#3B82F6]">
           <FolderDown size={16} />
-          <p className="font-mono text-xs tracking-[0.2em] uppercase">Downloads</p>
+          <p className="font-mono text-xs tracking-[0.2em] uppercase">
+            Downloads
+          </p>
         </div>
         <h1 className="font-display text-2xl sm:text-3xl font-medium text-navy dark:text-paper mb-6">
           All Downloadable Files
@@ -37,7 +60,10 @@ export default function Downloads() {
       <Section page="downloads" section="list">
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1">
-            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-navy-300" />
+            <Search
+              size={16}
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-navy-300"
+            />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
@@ -53,8 +79,8 @@ export default function Downloads() {
                 onClick={() => setCategory(c)}
                 className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                   category === c
-                    ? 'bg-[#D9383A] text-white border-[#D9383A] dark:bg-[#1E3A8A] dark:text-white dark:border-[#1E3A8A]'
-                    : 'border-navy-100 dark:border-navy-700 text-navy-500 dark:text-navy-200 hover:border-[#D9383A] dark:hover:border-[#1E3A8A] hover:text-[#D9383A] dark:hover:text-[#3B82F6]'
+                    ? "bg-[#D9383A] text-white border-[#D9383A] dark:bg-[#1E3A8A] dark:text-white dark:border-[#1E3A8A]"
+                    : "border-navy-100 dark:border-navy-700 text-navy-500 dark:text-navy-200 hover:border-[#D9383A] dark:hover:border-[#1E3A8A] hover:text-[#D9383A] dark:hover:text-[#3B82F6]"
                 }`}
               >
                 {c}
@@ -64,15 +90,17 @@ export default function Downloads() {
         </div>
 
         <p className="text-xs text-navy-400 dark:text-navy-300 mb-3 font-mono">
-          {filtered.length} file{filtered.length !== 1 ? 's' : ''} found
+          {filtered.length} file{filtered.length !== 1 ? "s" : ""} found
         </p>
 
         {/* Compact Square Cards Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
           {filtered.map((d) => {
             const fileUrl = resolveImageUrl(d.fileUrl);
-            const isPdf = /\.pdf($|\?)/i.test(d.fileUrl || '');
-            const isImage = /\.(jpg|jpeg|png|webp|gif)($|\?)/i.test(d.fileUrl || '');
+            const isPdf = /\.pdf($|\?)/i.test(d.fileUrl || "");
+            const isImage = /\.(jpg|jpeg|png|webp|gif)($|\?)/i.test(
+              d.fileUrl || "",
+            );
 
             return (
               <div
@@ -92,14 +120,19 @@ export default function Downloads() {
                   ) : (
                     <div className="flex flex-col items-center gap-1 text-navy-300 dark:text-navy-600">
                       <FileText size={28} />
-                      <span className="text-[9px] uppercase font-mono">No Preview</span>
+                      <span className="text-[9px] uppercase font-mono">
+                        No Preview
+                      </span>
                     </div>
                   )}
                 </div>
 
                 {/* Bottom Info & Download Button */}
                 <div className="flex flex-col gap-1.5 min-w-0">
-                  <h3 className="font-medium text-navy dark:text-paper text-xs truncate group-hover:text-[#D9383A] dark:group-hover:text-[#3B82F6] transition-colors" title={d.title}>
+                  <h3
+                    className="font-medium text-navy dark:text-paper text-xs truncate group-hover:text-[#D9383A] dark:group-hover:text-[#3B82F6] transition-colors"
+                    title={d.title}
+                  >
                     {d.title}
                   </h3>
                   <a
@@ -118,7 +151,9 @@ export default function Downloads() {
         </div>
 
         {filtered.length === 0 && (
-          <p className="text-center text-navy-400 dark:text-navy-300 py-16 text-sm">No downloads match your search.</p>
+          <p className="text-center text-navy-400 dark:text-navy-300 py-16 text-sm">
+            No downloads match your search.
+          </p>
         )}
       </Section>
     </div>

@@ -1,31 +1,31 @@
-import { useState } from 'react';
-import { useNavigate, useLocation, Navigate } from 'react-router';
-import { ShieldCheck } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import { Field, Input, Button, Banner } from '../../components/admin/Ui';
+import { useState } from "react";
+import { useNavigate, useLocation, Navigate } from "react-router";
+import { ShieldCheck } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
+import { Field, Input, Button, Banner } from "../../components/admin/Ui";
 
 export default function AdminLogin() {
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   if (isAuthenticated) {
-    return <Navigate to={location.state?.from?.pathname || '/admin'} replace />;
+    return <Navigate to={location.state?.from?.pathname || "/admin"} replace />;
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
     try {
       await login(email, password);
-      navigate(location.state?.from?.pathname || '/admin', { replace: true });
+      navigate(location.state?.from?.pathname || "/admin", { replace: true });
     } catch (err) {
-      setError(err.message || 'Login failed');
+      setError(err.message || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -39,7 +39,9 @@ export default function AdminLogin() {
             <ShieldCheck size={22} />
           </div>
           <h1 className="font-display text-xl text-navy-800">Admin Sign In</h1>
-          <p className="text-sm text-navy-500 mt-1">Swastik College control panel</p>
+          <p className="text-sm text-navy-500 mt-1">
+            Swastik College control panel
+          </p>
         </div>
 
         {error && (
@@ -67,8 +69,12 @@ export default function AdminLogin() {
               placeholder="••••••••"
             />
           </Field>
-          <Button type="submit" disabled={loading} className="w-full justify-center">
-            {loading ? 'Signing in…' : 'Sign In'}
+          <Button
+            type="submit"
+            disabled={loading}
+            className="w-full justify-center"
+          >
+            {loading ? "Signing in…" : "Sign In"}
           </Button>
         </form>
       </div>

@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router';
-import { ChevronDown, Download, CheckCircle2, ArrowLeft } from 'lucide-react';
-import { getCourse, resolveImageUrl } from '../api/client';
+import { useEffect, useState } from "react";
+import { useParams, Link } from "react-router";
+import { ChevronDown, Download, CheckCircle2, ArrowLeft } from "lucide-react";
+import { getCourse, resolveImageUrl } from "../api/client";
 
 function AccordionItem({ semester, isOpen, onToggle }) {
   return (
@@ -11,16 +11,24 @@ function AccordionItem({ semester, isOpen, onToggle }) {
         className="w-full flex items-center justify-between px-5 py-4 text-left"
         aria-expanded={isOpen}
       >
-        <span className="font-medium text-navy dark:text-paper text-sm">{semester.title}</span>
+        <span className="font-medium text-navy dark:text-paper text-sm">
+          {semester.title}
+        </span>
         <ChevronDown
           size={17}
-          className={`text-navy-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`text-navy-400 transition-transform ${isOpen ? "rotate-180" : ""}`}
         />
       </button>
       {isOpen && (
         <ul className="px-5 pb-4 space-y-2">
-          {(semester.subjects?.length ? semester.subjects.map((s) => s.name) : semester.courses || []).map((c) => (
-            <li key={c} className="flex items-center gap-2 text-sm text-navy-500 dark:text-navy-200">
+          {(semester.subjects?.length
+            ? semester.subjects.map((s) => s.name)
+            : semester.courses || []
+          ).map((c) => (
+            <li
+              key={c}
+              className="flex items-center gap-2 text-sm text-navy-500 dark:text-navy-200"
+            >
               <span className="w-1.5 h-1.5 rounded-full bg-marigold-400 shrink-0" />
               {c}
             </li>
@@ -42,12 +50,19 @@ export default function CourseDetail() {
   }, [slug]);
 
   if (!course) {
-    return <div className="max-w-4xl mx-auto px-4 sm:px-6 py-24 text-center text-navy-400">Loading program…</div>;
+    return (
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-24 text-center text-navy-400">
+        Loading program…
+      </div>
+    );
   }
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
-      <Link to="/programs" className="inline-flex items-center gap-1.5 text-sm text-navy-400 hover:text-marigold-600 mb-8">
+      <Link
+        to="/programs"
+        className="inline-flex items-center gap-1.5 text-sm text-navy-400 hover:text-marigold-600 mb-8"
+      >
         <ArrowLeft size={15} /> All programs
       </Link>
 
@@ -57,8 +72,12 @@ export default function CourseDetail() {
       <h1 className="font-display text-3xl sm:text-4xl font-medium text-navy dark:text-paper mb-2">
         {course.name}
       </h1>
-      <p className="text-navy-500 dark:text-navy-200 font-medium">{course.tagline}</p>
-      <p className="text-navy-400 dark:text-navy-300 mt-4 max-w-2xl leading-relaxed">{course.description}</p>
+      <p className="text-navy-500 dark:text-navy-200 font-medium">
+        {course.tagline}
+      </p>
+      <p className="text-navy-400 dark:text-navy-300 mt-4 max-w-2xl leading-relaxed">
+        {course.description}
+      </p>
 
       <a
         href={resolveImageUrl(course.syllabusUrl)}
@@ -77,8 +96,14 @@ export default function CourseDetail() {
           </h2>
           <ul className="space-y-3">
             {course.eligibility.map((e) => (
-              <li key={e} className="flex items-start gap-2.5 text-sm text-navy-500 dark:text-navy-200">
-                <CheckCircle2 size={16} className="text-teal-500 shrink-0 mt-0.5" />
+              <li
+                key={e}
+                className="flex items-start gap-2.5 text-sm text-navy-500 dark:text-navy-200"
+              >
+                <CheckCircle2
+                  size={16}
+                  className="text-teal-500 shrink-0 mt-0.5"
+                />
                 {e}
               </li>
             ))}

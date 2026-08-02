@@ -1,20 +1,22 @@
-import Blog from '../models/Blog.js';
+import Blog from "../models/Blog.js";
 
 const createSlug = (title) =>
   title
     .toLowerCase()
-    .replace(/[^a-z0-9 -]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-') + `-${Date.now()}`;
+    .replace(/[^a-z0-9 -]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-") + `-${Date.now()}`;
 
 // GET /api/blogs — public (all posts for admin uses ?all=true)
 export async function listBlogs(req, res) {
   try {
-    const filter = req.query.all === 'true' ? {} : { published: true };
+    const filter = req.query.all === "true" ? {} : { published: true };
     const blogs = await Blog.find(filter).sort({ createdAt: -1 });
     res.json(blogs);
   } catch (err) {
-    res.status(500).json({ message: 'Error fetching blogs', error: err.message });
+    res
+      .status(500)
+      .json({ message: "Error fetching blogs", error: err.message });
   }
 }
 
@@ -23,19 +25,25 @@ export async function getBlog(req, res) {
   try {
     const { identifier } = req.params;
     const blog = await Blog.findOne({
-      $or: [{ slug: identifier }, { _id: identifier.match(/^[0-9a-fA-F]{24}$/) ? identifier : null }],
+      $or: [
+        { slug: identifier },
+        { _id: identifier.match(/^[0-9a-fA-F]{24}$/) ? identifier : null },
+      ],
     });
-    if (!blog) return res.status(404).json({ message: 'Blog post not found' });
+    if (!blog) return res.status(404).json({ message: "Blog post not found" });
     res.json(blog);
   } catch (err) {
-    res.status(500).json({ message: 'Error fetching post', error: err.message });
+    res
+      .status(500)
+      .json({ message: "Error fetching post", error: err.message });
   }
 }
 
 // POST /api/blogs — admin only
 export async function createBlog(req, res) {
   try {
-    const { title, excerpt, content, category, author, imageUrl, published } = req.body;
+    const { title, excerpt, content, category, author, imageUrl, published } =
+      req.body;
     const slug = createSlug(title);
 
     const newBlog = new Blog({
@@ -52,7 +60,9 @@ export async function createBlog(req, res) {
     const savedBlog = await newBlog.save();
     res.status(201).json(savedBlog);
   } catch (err) {
-    res.status(400).json({ message: 'Error creating blog post', error: err.message });
+    res
+      .status(400)
+      .json({ message: "Error creating blog post", error: err.message });
   }
 }
 
@@ -63,10 +73,13 @@ export async function updateBlog(req, res) {
       new: true,
       runValidators: true,
     });
-    if (!updatedBlog) return res.status(404).json({ message: 'Blog post not found' });
+    if (!updatedBlog)
+      return res.status(404).json({ message: "Blog post not found" });
     res.json(updatedBlog);
   } catch (err) {
-    res.status(400).json({ message: 'Error updating blog post', error: err.message });
+    res
+      .status(400)
+      .json({ message: "Error updating blog post", error: err.message });
   }
 }
 
@@ -74,9 +87,12 @@ export async function updateBlog(req, res) {
 export async function deleteBlog(req, res) {
   try {
     const deletedBlog = await Blog.findByIdAndDelete(req.params.id);
-    if (!deletedBlog) return res.status(404).json({ message: 'Blog post not found' });
-    res.json({ message: 'Blog post deleted successfully' });
+    if (!deletedBlog)
+      return res.status(404).json({ message: "Blog post not found" });
+    res.json({ message: "Blog post deleted successfully" });
   } catch (err) {
-    res.status(500).json({ message: 'Error deleting blog post', error: err.message });
+    res
+      .status(500)
+      .json({ message: "Error deleting blog post", error: err.message });
   }
 }

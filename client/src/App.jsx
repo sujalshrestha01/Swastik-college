@@ -1,45 +1,45 @@
-import { Routes, Route, useLocation, Navigate } from 'react-router';
-import { useEffect } from 'react';
-import { ThemeProvider } from './context/ThemeContext';
-import { SettingsProvider, useSettings } from './context/SettingsContext';
-import { AuthProvider } from './context/AuthContext';
-import NotificationTicker from './components/NotificationTicker';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
-import FloatingQuickAction from './components/FloatingQuickAction';
-import Home from './pages/Home';
-import Programs from './pages/Programs';
-import CourseDetail from './pages/CourseDetail';
-import NoticeBoard from './pages/NoticeBoard';
-import Downloads from './pages/Downloads';
-import Contact from './pages/Contact';
-import Gallery from './pages/Gallery';
-import About from './pages/About';
-import Faculty from './pages/Faculty';
-import Blog from './pages/Blog'; // Public Blog Page
-import NotFound from './pages/NotFound';
+import { Routes, Route, useLocation, Navigate } from "react-router";
+import { useEffect } from "react";
+import { ThemeProvider } from "./context/ThemeContext";
+import { SettingsProvider, useSettings } from "./context/SettingsContext";
+import { AuthProvider } from "./context/AuthContext";
+import NotificationTicker from "./components/NotificationTicker";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import FloatingQuickAction from "./components/FloatingQuickAction";
+import Home from "./pages/Home";
+import Programs from "./pages/Programs";
+import CourseDetail from "./pages/CourseDetail";
+import NoticeBoard from "./pages/NoticeBoard";
+import Downloads from "./pages/Downloads";
+import Contact from "./pages/Contact";
+import Gallery from "./pages/Gallery";
+import About from "./pages/About";
+import Faculty from "./pages/Faculty";
+import Blog from "./pages/Blog"; // Public Blog Page
+import NotFound from "./pages/NotFound";
 
-import AdminLogin from './pages/admin/AdminLogin';
-import AcceptInvite from './pages/admin/AcceptInvite';
-import AdminLayout from './components/admin/AdminLayout';
-import ProtectedRoute from './components/admin/ProtectedRoute';
-import AdminBlog from './pages/admin/AdminBlog';
-import AdminDashboard from './pages/admin/AdminDashboard';
-import AdminCourses from './pages/admin/AdminCourses';
-import AdminNotices from './pages/admin/AdminNotices';
-import AdminDownloads from './pages/admin/AdminDownloads';
-import AdminFaculty from './pages/admin/AdminFaculty';
-import AdminEvents from './pages/admin/AdminEvents';
-import AdminTestimonials from './pages/admin/AdminTestimonials';
-import AdminPlacementPartners from './pages/admin/AdminPlacementPartners';
-import AdminGallery from './pages/admin/AdminGallery';
-import AdminMessages from './pages/admin/AdminMessages';
-import AdminSettings from './pages/admin/AdminSettings';
-import AdminVisibility from './pages/admin/AdminVisibility';
-import AdminAcademics from './pages/admin/AdminAcademics';
-import AdminFAQ from './pages/admin/AdminFAQ';
-import NonCreditCourses from './pages/NonCreditCourses';
-import { PageGate } from './components/Visibility';
+import AdminLogin from "./pages/admin/AdminLogin";
+import AcceptInvite from "./pages/admin/AcceptInvite";
+import AdminLayout from "./components/admin/AdminLayout";
+import ProtectedRoute from "./components/admin/ProtectedRoute";
+import AdminBlog from "./pages/admin/AdminBlog";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminCourses from "./pages/admin/AdminCourses";
+import AdminNotices from "./pages/admin/AdminNotices";
+import AdminDownloads from "./pages/admin/AdminDownloads";
+import AdminFaculty from "./pages/admin/AdminFaculty";
+import AdminEvents from "./pages/admin/AdminEvents";
+import AdminTestimonials from "./pages/admin/AdminTestimonials";
+import AdminPlacementPartners from "./pages/admin/AdminPlacementPartners";
+import AdminGallery from "./pages/admin/AdminGallery";
+import AdminMessages from "./pages/admin/AdminMessages";
+import AdminSettings from "./pages/admin/AdminSettings";
+import AdminVisibility from "./pages/admin/AdminVisibility";
+import AdminAcademics from "./pages/admin/AdminAcademics";
+import AdminFAQ from "./pages/admin/AdminFAQ";
+import NonCreditCourses from "./pages/NonCreditCourses";
+import { PageGate } from "./components/Visibility";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -51,24 +51,90 @@ function ScrollToTop() {
 
 function PublicSite() {
   const { settings, isPageEnabled, isSectionVisible } = useSettings();
-  const isBlogDisabled = settings?.features?.blogDisabled || !isPageEnabled('blog');
+  const isBlogDisabled =
+    settings?.features?.blogDisabled || !isPageEnabled("blog");
 
   return (
     <div className="min-h-screen flex flex-col bg-paper dark:bg-navy-900 transition-colors">
-      {isSectionVisible('global', 'notificationTicker') && <NotificationTicker />}
-      {isSectionVisible('global', 'navbar') && <Navbar />}
+      {isSectionVisible("global", "notificationTicker") && (
+        <NotificationTicker />
+      )}
+      {isSectionVisible("global", "navbar") && <Navbar />}
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/programs" element={<PageGate page="programs"><Programs /></PageGate>} />
-          <Route path="/programs/:slug" element={<PageGate page="programs"><CourseDetail /></PageGate>} />
-          <Route path="/notices" element={<PageGate page="notices"><NoticeBoard /></PageGate>} />
-          <Route path="/downloads" element={<PageGate page="downloads"><Downloads /></PageGate>} />
-          <Route path="/about" element={<PageGate page="about"><About /></PageGate>} />
-          <Route path="/faculty" element={<PageGate page="faculty"><Faculty /></PageGate>} />
-          <Route path="/contact" element={<PageGate page="contact"><Contact /></PageGate>} />
-          <Route path="/gallery" element={<PageGate page="gallery"><Gallery /></PageGate>} />
-          <Route path="/programs/non-credit" element={<PageGate page="programs"><NonCreditCourses /></PageGate>} />
+          <Route
+            path="/programs"
+            element={
+              <PageGate page="programs">
+                <Programs />
+              </PageGate>
+            }
+          />
+          <Route
+            path="/programs/:slug"
+            element={
+              <PageGate page="programs">
+                <CourseDetail />
+              </PageGate>
+            }
+          />
+          <Route
+            path="/notices"
+            element={
+              <PageGate page="notices">
+                <NoticeBoard />
+              </PageGate>
+            }
+          />
+          <Route
+            path="/downloads"
+            element={
+              <PageGate page="downloads">
+                <Downloads />
+              </PageGate>
+            }
+          />
+          <Route
+            path="/about"
+            element={
+              <PageGate page="about">
+                <About />
+              </PageGate>
+            }
+          />
+          <Route
+            path="/faculty"
+            element={
+              <PageGate page="faculty">
+                <Faculty />
+              </PageGate>
+            }
+          />
+          <Route
+            path="/contact"
+            element={
+              <PageGate page="contact">
+                <Contact />
+              </PageGate>
+            }
+          />
+          <Route
+            path="/gallery"
+            element={
+              <PageGate page="gallery">
+                <Gallery />
+              </PageGate>
+            }
+          />
+          <Route
+            path="/programs/non-credit"
+            element={
+              <PageGate page="programs">
+                <NonCreditCourses />
+              </PageGate>
+            }
+          />
 
           {/* Blog visibility respects both the legacy quick-toggle and the generic
               page visibility engine, so either one hides the page. */}
@@ -84,8 +150,10 @@ function PublicSite() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
-      {isSectionVisible('global', 'footer') && <Footer />}
-      {isSectionVisible('global', 'floatingQuickAction') && <FloatingQuickAction />}
+      {isSectionVisible("global", "footer") && <Footer />}
+      {isSectionVisible("global", "floatingQuickAction") && (
+        <FloatingQuickAction />
+      )}
     </div>
   );
 }
@@ -116,7 +184,10 @@ export default function App() {
               <Route path="faculty" element={<AdminFaculty />} />
               <Route path="events" element={<AdminEvents />} />
               <Route path="testimonials" element={<AdminTestimonials />} />
-              <Route path="placement-partners" element={<AdminPlacementPartners />} />
+              <Route
+                path="placement-partners"
+                element={<AdminPlacementPartners />}
+              />
               <Route path="gallery" element={<AdminGallery />} />
               <Route path="messages" element={<AdminMessages />} />
               <Route path="faq" element={<AdminFAQ />} />

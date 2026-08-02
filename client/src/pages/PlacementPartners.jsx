@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { getPlacementPartners, resolveImageUrl } from '../api/client';
+import { useEffect, useState } from "react";
+import { getPlacementPartners, resolveImageUrl } from "../api/client";
 
 export default function PlacementPartners() {
   const [partners, setPartners] = useState([]);
@@ -15,14 +15,17 @@ export default function PlacementPartners() {
   return (
     <section className="w-full bg-slate-100/90 dark:bg-navy-900/90 py-12 px-4 sm:px-8 border-y border-slate-200/60 dark:border-navy-700 transition-colors duration-300">
       <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-10">
-
         {/* Title Section */}
         <div className="text-center lg:text-left shrink-0 max-w-sm">
           <h2 className="text-2xl sm:text-3xl font-serif text-slate-800 dark:text-white tracking-tight font-medium">
-            Our <span className="text-[#D9383A] dark:text-[#3B82F6] font-bold">Placement Partners</span>
+            Our{" "}
+            <span className="text-[#D9383A] dark:text-[#3B82F6] font-bold">
+              Placement Partners
+            </span>
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-navy-100 mt-2 font-sans leading-relaxed">
-            Collaborating with industry leaders to provide direct career pathways for our graduates.
+            Collaborating with industry leaders to provide direct career
+            pathways for our graduates.
           </p>
         </div>
 
@@ -41,7 +44,12 @@ export default function PlacementPartners() {
               </div>
             );
             return partner.websiteUrl ? (
-              <a key={partner._id} href={partner.websiteUrl} target="_blank" rel="noopener noreferrer">
+              <a
+                key={partner._id}
+                href={partner.websiteUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 {card}
               </a>
             ) : (
@@ -49,7 +57,6 @@ export default function PlacementPartners() {
             );
           })}
         </div>
-
       </div>
     </section>
   );

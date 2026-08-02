@@ -1,24 +1,29 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router';
-import { ArrowRight, BookOpen } from 'lucide-react';
-import { getBlogs, resolveImageUrl } from '../api/client';
-import { useSettings } from '../context/SettingsContext';
+import { useEffect, useState } from "react";
+import { Link } from "react-router";
+import { ArrowRight, BookOpen } from "lucide-react";
+import { getBlogs, resolveImageUrl } from "../api/client";
+import { useSettings } from "../context/SettingsContext";
 
 function formatDate(iso) {
-  if (!iso) return '';
-  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  if (!iso) return "";
+  return new Date(iso).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 }
 
 export default function BlogSection() {
   const { settings, isPageEnabled } = useSettings();
-  const isBlogDisabled = settings?.features?.blogDisabled || !isPageEnabled('blog');
+  const isBlogDisabled =
+    settings?.features?.blogDisabled || !isPageEnabled("blog");
   const [blogs, setBlogs] = useState([]);
 
   useEffect(() => {
     if (!isBlogDisabled) {
       getBlogs()
         .then((data) => setBlogs(data ? data.slice(0, 3) : []))
-        .catch((err) => console.error('Failed to load blogs:', err));
+        .catch((err) => console.error("Failed to load blogs:", err));
     }
   }, [isBlogDisabled]);
 
@@ -68,9 +73,11 @@ export default function BlogSection() {
                   <div>
                     <div className="flex items-center justify-between text-xs text-slate-500 dark:text-navy-100/70 mb-3">
                       <span className="font-mono uppercase px-2.5 py-1 rounded-md bg-red-50 dark:bg-blue-950/50 border border-red-100 dark:border-blue-900/40 text-[#D9383A] dark:text-[#3B82F6] font-semibold">
-                        {article.category || 'General'}
+                        {article.category || "General"}
                       </span>
-                      <span className="font-mono">{formatDate(article.createdAt || article.date)}</span>
+                      <span className="font-mono">
+                        {formatDate(article.createdAt || article.date)}
+                      </span>
                     </div>
                     <h3 className="font-display text-lg font-semibold text-slate-900 dark:text-white group-hover:text-[#D9383A] dark:group-hover:text-[#3B82F6] transition-colors line-clamp-2">
                       {article.title}

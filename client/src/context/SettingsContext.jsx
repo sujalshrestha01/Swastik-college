@@ -1,44 +1,70 @@
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { getSettings } from '../api/client';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
+import { getSettings } from "../api/client";
 
 const defaultSettings = {
-  collegeName: 'Swastik College',
-  collegeShortName: 'Swastik',
-  tagline: 'Shaping Careers, Building Futures',
-  establishedYear: '2005',
-  affiliation: 'Tribhuvan University (TU)',
-  logoUrl: '',
-  heroHeadline: 'Shaping Careers, Building Futures',
+  collegeName: "Swastik College",
+  collegeShortName: "Swastik",
+  tagline: "Shaping Careers, Building Futures",
+  establishedYear: "2005",
+  affiliation: "Tribhuvan University (TU)",
+  logoUrl: "",
+  heroHeadline: "Shaping Careers, Building Futures",
   heroSubheadline:
-    'A TU-affiliated college offering BSc. CSIT, BCA and BBS programs, built around small classes and real project experience.',
-  heroImageUrl: '',
+    "A TU-affiliated college offering BSc. CSIT, BCA and BBS programs, built around small classes and real project experience.",
+  heroImageUrl: "",
   heroImages: [],
-  heroCtaText: 'Explore Programs',
-  heroCtaLink: '/programs',
+  heroCtaText: "Explore Programs",
+  heroCtaLink: "/programs",
 
   heroStatusLog: [
-    { label: 'college', value: '' },       // filled from collegeShortName at render if empty
-    { label: 'admissions', value: 'open' },
-    { label: 'affiliation', value: '' },   // filled from affiliation at render if empty
-    { label: 'contact', value: '' },       // filled from phone at render if empty
+    { label: "college", value: "" }, // filled from collegeShortName at render if empty
+    { label: "admissions", value: "open" },
+    { label: "affiliation", value: "" }, // filled from affiliation at render if empty
+    { label: "contact", value: "" }, // filled from phone at render if empty
   ],
   whyChooseUs: [
-    { icon: 'GraduationCap', title: 'TU Affiliated Programs', description: 'Offering industry-aligned BCA & B.Sc. CSIT degrees with standard 4-year, 8-semester curriculum excellence.' },
-    { icon: 'Users', title: 'Industry Partnerships & 100% Placement', description: 'Direct ties with top IT & Fintech giants like F1Soft and eSewa to provide internships, workshops, and career readiness.' },
-    { icon: 'Target', title: 'Practical & Professional Training', description: 'Beyond standard theory, students gain hands-on expertise through continuous lab work, bootcamps, and real projects.' },
-    { icon: 'HeartHandshake', title: 'Experienced Faculty', description: 'Guided by seasoned educators, tech leaders, and vibrant entrepreneurs dedicated to student mentorship.' },
+    {
+      icon: "GraduationCap",
+      title: "TU Affiliated Programs",
+      description:
+        "Offering industry-aligned BCA & B.Sc. CSIT degrees with standard 4-year, 8-semester curriculum excellence.",
+    },
+    {
+      icon: "Users",
+      title: "Industry Partnerships & 100% Placement",
+      description:
+        "Direct ties with top IT & Fintech giants like F1Soft and eSewa to provide internships, workshops, and career readiness.",
+    },
+    {
+      icon: "Target",
+      title: "Practical & Professional Training",
+      description:
+        "Beyond standard theory, students gain hands-on expertise through continuous lab work, bootcamps, and real projects.",
+    },
+    {
+      icon: "HeartHandshake",
+      title: "Experienced Faculty",
+      description:
+        "Guided by seasoned educators, tech leaders, and vibrant entrepreneurs dedicated to student mentorship.",
+    },
   ],
-  aboutSummary: '',
-  missionStatement: '',
-  visionStatement: '',
-  address: 'Kathmandu, Nepal',
-  phone: '',
-  email: '',
-  officeHours: '',
+  aboutSummary: "",
+  missionStatement: "",
+  visionStatement: "",
+  address: "Kathmandu, Nepal",
+  phone: "",
+  email: "",
+  officeHours: "",
   socialLinks: {},
   stats: [],
-  footerNote: 'All rights reserved.',
-  announcementBarText: '',
+  footerNote: "All rights reserved.",
+  announcementBarText: "",
   announcementBarEnabled: false,
   // Legacy flat toggles (kept for backward compatibility)
   features: {
@@ -56,7 +82,11 @@ const defaultSettings = {
   about: { timeline: [], values: [], leadership: null },
 };
 
-const SettingsContext = createContext({ settings: defaultSettings, loading: true, refresh: () => {} });
+const SettingsContext = createContext({
+  settings: defaultSettings,
+  loading: true,
+  refresh: () => {},
+});
 
 export function SettingsProvider({ children }) {
   const [settings, setSettings] = useState(defaultSettings);
@@ -99,12 +129,15 @@ export function SettingsProvider({ children }) {
   function isSectionVisible(page, section) {
     if (!isPageEnabled(page)) return false;
     const p = settings.visibility?.[page];
-    if (!p || !p.sections || typeof p.sections[section] !== 'boolean') return true;
+    if (!p || !p.sections || typeof p.sections[section] !== "boolean")
+      return true;
     return p.sections[section];
   }
 
   return (
-    <SettingsContext.Provider value={{ settings, loading, refresh, isPageEnabled, isSectionVisible }}>
+    <SettingsContext.Provider
+      value={{ settings, loading, refresh, isPageEnabled, isSectionVisible }}
+    >
       {children}
     </SettingsContext.Provider>
   );

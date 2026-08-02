@@ -82,56 +82,61 @@ export default function NonCreditCourses() {
               No certification courses published yet.
             </p>
           ) : (
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch">
-  {courses.map((course) => {
-    // Show duration only if non-empty string exists
-    const hasDuration = Boolean(course.duration && course.duration.trim().length > 0);
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch">
+              {courses.map((course) => {
+                // Show duration only if non-empty string exists
+                const hasDuration = Boolean(
+                  course.duration && course.duration.trim().length > 0,
+                );
 
-    return (
-      <div
-        key={course._id}
-        className="group flex items-stretch bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all duration-200 shadow-xs overflow-hidden"
-      >
-        {/* FULL-HEIGHT COVER IMAGE ON LEFT EDGE */}
-        <div className="w-28 sm:w-36 shrink-0 bg-slate-100 dark:bg-slate-800 flex items-center justify-center relative overflow-hidden">
-          {course.logoUrl ? (
-            <img
-              src={resolveImageUrl(course.logoUrl)}
-              alt={course.name}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-          ) : (
-            <BookOpen size={28} className="text-slate-400 dark:text-slate-500" />
-          )}
-        </div>
+                return (
+                  <div
+                    key={course._id}
+                    className="group flex items-stretch bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-all duration-200 shadow-xs overflow-hidden"
+                  >
+                    {/* FULL-HEIGHT COVER IMAGE ON LEFT EDGE */}
+                    <div className="w-28 sm:w-36 shrink-0 bg-slate-100 dark:bg-slate-800 flex items-center justify-center relative overflow-hidden">
+                      {course.logoUrl ? (
+                        <img
+                          src={resolveImageUrl(course.logoUrl)}
+                          alt={course.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <BookOpen
+                          size={28}
+                          className="text-slate-400 dark:text-slate-500"
+                        />
+                      )}
+                    </div>
 
-        {/* TEXT DETAILS ON THE RIGHT WITH INTERNAL PADDING */}
-        <div className="flex-1 p-4 sm:p-5 min-w-0 flex flex-col justify-between">
-          <div>
-            <div className="flex items-start justify-between gap-2 mb-1.5">
-              <h3 className="font-display text-base sm:text-lg font-bold text-slate-900 dark:text-white capitalize leading-snug truncate">
-                {course.name}
-              </h3>
+                    {/* TEXT DETAILS ON THE RIGHT WITH INTERNAL PADDING */}
+                    <div className="flex-1 p-4 sm:p-5 min-w-0 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-start justify-between gap-2 mb-1.5">
+                          <h3 className="font-display text-base sm:text-lg font-bold text-slate-900 dark:text-white capitalize leading-snug truncate">
+                            {course.name}
+                          </h3>
 
-              {/* Conditional Duration Badge */}
-              {hasDuration && (
-                <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60 shrink-0">
-                  {course.duration}
-                </span>
-              )}
+                          {/* Conditional Duration Badge */}
+                          {hasDuration && (
+                            <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60 shrink-0">
+                              {course.duration}
+                            </span>
+                          )}
+                        </div>
+
+                        {course.description && (
+                          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-3">
+                            {course.description}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-
-            {course.description && (
-              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-3">
-                {course.description}
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  })}
-</div>
           )}
         </section>
 
