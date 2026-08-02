@@ -31,6 +31,7 @@ import AdminDownloads from './pages/admin/AdminDownloads';
 import AdminFaculty from './pages/admin/AdminFaculty';
 import AdminEvents from './pages/admin/AdminEvents';
 import AdminTestimonials from './pages/admin/AdminTestimonials';
+import AdminPlacementPartners from './pages/admin/AdminPlacementPartners';
 import AdminGallery from './pages/admin/AdminGallery';
 import AdminMessages from './pages/admin/AdminMessages';
 import AdminSettings from './pages/admin/AdminSettings';
@@ -115,6 +116,7 @@ export default function App() {
               <Route path="faculty" element={<AdminFaculty />} />
               <Route path="events" element={<AdminEvents />} />
               <Route path="testimonials" element={<AdminTestimonials />} />
+              <Route path="placement-partners" element={<AdminPlacementPartners />} />
               <Route path="gallery" element={<AdminGallery />} />
               <Route path="messages" element={<AdminMessages />} />
               <Route path="faq" element={<AdminFAQ />} />

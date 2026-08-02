@@ -21,6 +21,7 @@ import {
   Sparkles,
   HelpCircle,
   FileDown,
+  Handshake,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
@@ -62,6 +63,7 @@ const navGroups = [
     items: [
       { to: "/admin/events", label: "Events", icon: CalendarDays },
       { to: "/admin/testimonials", label: "Testimonials", icon: Quote },
+      { to: "/admin/placement-partners", label: "Placement Partners", icon: Handshake },
     ],
   },
   {

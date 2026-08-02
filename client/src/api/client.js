@@ -91,6 +91,9 @@ export function getEvents() {
 export function getTestimonials() {
   return safeFetch('/testimonials', mockTestimonials);
 }
+export function getPlacementPartners() {
+  return safeFetch('/placement-partners', []);
+}
 // Gallery events — each event can hold multiple images + a chosen thumbnail.
 export function getGalleryEvents() {
   return safeFetch('/gallery', []);
@@ -165,6 +168,7 @@ export const downloadsAdmin = makeCrud('downloads');
 export const facultyAdmin = makeCrud('faculty');
 export const eventsAdmin = makeCrud('events');
 export const testimonialsAdmin = makeCrud('testimonials');
+export const placementPartnersAdmin = makeCrud('placement-partners');
 export const galleryAdmin = makeCrud('gallery');
 
 export const coursesAdmin = {
