@@ -51,21 +51,21 @@ export default function QuickAccessCards() {
           <Link
             key={title}
             to={to}
-            className="group bg-white dark:bg-slate-900 rounded-xl p-5 border-b-2 border-b-transparent hover:border-b-[#1E3A8A] dark:hover:border-b-blue-400 hover:-translate-y-1 transition-all duration-300 w-full lg:max-w-xs"
+            className="group bg-white dark:bg-navy-900/90 rounded-xl p-5 border border-slate-200/80 dark:border-navy-700 border-b-2 border-b-transparent hover:border-b-[#D9383A] dark:hover:border-b-[#3B82F6] shadow-xs hover:shadow-md dark:shadow-navy-950/50 hover:-translate-y-1 transition-all duration-300 w-full lg:max-w-xs"
           >
-            <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-slate-800 text-[#1E3A8A] dark:text-blue-400 group-hover:bg-[#1E3A8A] group-hover:text-white flex items-center justify-center mb-4 transition-colors">
+            <div className="w-10 h-10 rounded-lg bg-red-50 dark:bg-navy-800 text-[#D9383A] dark:text-[#3B82F6] group-hover:bg-[#D9383A] dark:group-hover:bg-[#3B82F6] group-hover:text-white flex items-center justify-center mb-4 transition-colors">
               <Icon size={19} />
             </div>
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-slate-900 dark:text-white text-sm sm:text-base group-hover:text-[#1E3A8A] dark:group-hover:text-blue-400 transition-colors">
+              <h3 className="font-semibold text-slate-900 dark:text-white text-sm sm:text-base group-hover:text-[#D9383A] dark:group-hover:text-[#3B82F6] transition-colors">
                 {title}
               </h3>
               <ArrowUpRight
                 size={15}
-                className="text-slate-400 group-hover:text-[#1E3A8A] dark:group-hover:text-blue-400 transition-colors"
+                className="text-slate-400 dark:text-navy-100/70 group-hover:text-[#D9383A] dark:group-hover:text-[#3B82F6] transition-colors"
               />
             </div>
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1.5">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-navy-100 mt-1.5">
               {desc}
             </p>
           </Link>
