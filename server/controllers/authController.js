@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import Admin from "../models/Admin.js";
-import { sendInviteEmail } from "../utils/mailer.js";
+import { sendInviteEmail, sendPasswordResetEmail } from "../utils/mailer.js";
 
 function signToken(admin) {
   return jwt.sign(
@@ -179,11 +179,9 @@ export async function acceptInvite(req, res) {
     }).select("+inviteToken +inviteTokenExpires");
 
     if (!admin) {
-      return res
-        .status(400)
-        .json({
-          message: "Invite link is invalid, already used, or has expired",
-        });
+      return res.status(400).json({
+        message: "Invite link is invalid, already used, or has expired",
+      });
     }
 
     admin.password = password; // hashed automatically by the pre('save') hook
@@ -207,6 +205,96 @@ export async function acceptInvite(req, res) {
     res
       .status(500)
       .json({ message: "Failed to accept invite", error: err.message });
+  }
+}
+
+// POST /api/auth/forgot-password — always returns the same generic message
+// whether or not the email exists, so this endpoint can't be used to check
+// which emails are registered admins ("account enumeration").
+export async function forgotPassword(req, res) {
+  const genericResponse = {
+    message: "If an account exists for that email, a reset link has been sent.",
+  };
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ message: "Email is required" });
+
+    const admin = await Admin.findOne({
+      email: email.toLowerCase().trim(),
+      status: "active",
+    });
+
+    if (admin) {
+      const resetPasswordToken = crypto.randomBytes(32).toString("hex");
+      const resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+      admin.resetPasswordToken = resetPasswordToken;
+      admin.resetPasswordExpires = resetPasswordExpires;
+      await admin.save();
+
+      const resetLink = `${process.env.CLIENT_URL || "http://localhost:5173"}/admin/reset-password?token=${resetPasswordToken}`;
+      await sendPasswordResetEmail({
+        to: admin.email,
+        name: admin.name,
+        resetLink,
+      });
+    }
+    // Deliberately identical response either way — see comment above.
+    res.json(genericResponse);
+  } catch (err) {
+    // Even on an unexpected error, don't leak anything different to the client.
+    res.json(genericResponse);
+  }
+}
+
+// POST /api/auth/reset-password — single-use: the token is cleared the
+// moment it's used, and it also expires after 1 hour on its own.
+export async function resetPassword(req, res) {
+  try {
+    const { token, password } = req.body;
+    if (!token || !password) {
+      return res
+        .status(400)
+        .json({ message: "Token and new password are required" });
+    }
+    if (password.length < 8) {
+      return res
+        .status(400)
+        .json({ message: "Password must be at least 8 characters" });
+    }
+
+    const admin = await Admin.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: new Date() },
+    }).select("+resetPasswordToken +resetPasswordExpires");
+
+    if (!admin) {
+      return res
+        .status(400)
+        .json({
+          message: "Reset link is invalid, already used, or has expired",
+        });
+    }
+
+    admin.password = password; // hashed automatically by the pre('save') hook
+    admin.resetPasswordToken = undefined;
+    admin.resetPasswordExpires = undefined;
+    await admin.save();
+
+    const token2 = signToken(admin);
+    res.json({
+      message: "Password reset successfully",
+      token: token2,
+      admin: {
+        id: admin._id,
+        name: admin.name,
+        email: admin.email,
+        role: admin.role,
+      },
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Failed to reset password", error: err.message });
   }
 }
 

@@ -71,3 +71,44 @@ export async function sendInviteEmail({ to, name, role, inviteLink }) {
     return { sent: false, reason: err.message };
   }
 }
+
+
+/**
+ * Sends the password-reset email with the reset link. Same sent/reason
+ * contract as sendInviteEmail — non-fatal if SMTP isn't configured.
+ */
+export async function sendPasswordResetEmail({ to, name, resetLink }) {
+  const transport = getTransporter();
+  if (!transport) {
+    return { sent: false, reason: 'SMTP not configured (SMTP_HOST/SMTP_USER/SMTP_PASS missing in .env)' };
+  }
+
+  const from = process.env.EMAIL_FROM || process.env.SMTP_USER;
+
+  try {
+    await transport.sendMail({
+      from: `"Swastik College Admin" <${from}>`,
+      to,
+      subject: 'Reset your Swastik College admin password',
+      html: `
+        <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+          <h2 style="color: #1E3A8A;">Hi ${name},</h2>
+          <p>We received a request to reset the password for your Swastik College admin account.</p>
+          <p>
+            <a href="${resetLink}" style="display:inline-block;background:#D9383A;color:#fff;
+               padding:10px 20px;border-radius:6px;text-decoration:none;font-weight:bold;">
+              Reset Password
+            </a>
+          </p>
+          <p style="color:#64748b;font-size:13px;">
+            This link expires in 1 hour and can only be used once.
+            If you didn't request this, you can safely ignore this email — your password won't change.
+          </p>
+        </div>
+      `,
+    });
+    return { sent: true };
+  } catch (err) {
+    return { sent: false, reason: err.message };
+  }
+}

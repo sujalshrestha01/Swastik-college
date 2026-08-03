@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useLocation, Navigate } from "react-router";
+import { useNavigate, useLocation, Navigate, Link } from "react-router";
 import { ShieldCheck } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { Field, Input, Button, Banner } from "../../components/admin/Ui";
@@ -69,6 +69,14 @@ export default function AdminLogin() {
               placeholder="••••••••"
             />
           </Field>
+          <div className="text-right -mt-2">
+            <Link
+              to="/admin/forgot-password"
+              className="text-xs text-marigold-500 font-medium hover:underline"
+            >
+              Forgot password?
+            </Link>
+          </div>
           <Button
             type="submit"
             disabled={loading}

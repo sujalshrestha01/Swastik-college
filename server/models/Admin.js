@@ -18,6 +18,8 @@ const adminSchema = new mongoose.Schema(
     status: { type: String, enum: ["pending", "active"], default: "active" },
     inviteToken: { type: String, select: false },
     inviteTokenExpires: { type: Date, select: false },
+    resetPasswordToken: { type: String, select: false },
+    resetPasswordExpires: { type: Date, select: false },
   },
   { timestamps: true },
 );

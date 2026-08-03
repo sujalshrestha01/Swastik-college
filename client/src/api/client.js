@@ -144,6 +144,18 @@ export function acceptInvite(token, password) {
     body: JSON.stringify({ token, password }),
   });
 }
+export function forgotPassword(email) {
+  return apiCall("/auth/forgot-password", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+export function resetPassword(token, password) {
+  return apiCall("/auth/reset-password", {
+    method: "POST",
+    body: JSON.stringify({ token, password }),
+  });
+}
 export function listAdmins() {
   return apiCall("/auth/admins");
 }

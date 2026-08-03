@@ -21,6 +21,8 @@ import NotFound from "./pages/NotFound";
 
 import AdminLogin from "./pages/admin/AdminLogin";
 import AcceptInvite from "./pages/admin/AcceptInvite";
+import ForgotPassword from "./pages/admin/ForgotPassword";
+import ResetPassword from "./pages/admin/ResetPassword";
 import AdminLayout from "./components/admin/AdminLayout";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
 import AdminBlog from "./pages/admin/AdminBlog";
@@ -35,7 +37,7 @@ import AdminPlacementPartners from "./pages/admin/AdminPlacementPartners";
 import AdminGallery from "./pages/admin/AdminGallery";
 import AdminMessages from "./pages/admin/AdminMessages";
 import AdminSettings from "./pages/admin/AdminSettings";
-import AdminUsers from './pages/admin/AdminUsers';
+import AdminUsers from "./pages/admin/AdminUsers";
 import AdminVisibility from "./pages/admin/AdminVisibility";
 import AdminAcademics from "./pages/admin/AdminAcademics";
 import AdminFAQ from "./pages/admin/AdminFAQ";
@@ -168,6 +170,8 @@ export default function App() {
           <Routes>
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin/accept-invite" element={<AcceptInvite />} />
+            <Route path="/admin/forgot-password" element={<ForgotPassword />} />
+            <Route path="/admin/reset-password" element={<ResetPassword />} />
             <Route
               path="/admin/*"
               element={

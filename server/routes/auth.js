@@ -7,6 +7,8 @@ import {
   changePassword,
   inviteAdmin,
   acceptInvite,
+  forgotPassword,
+  resetPassword,
   listAdmins,
   updateAdminRole,
   resendInvite,
@@ -31,6 +33,8 @@ router.put("/password", requireAuth, changePassword);
 
 router.post("/invite", requireAuth, inviteAdmin);
 router.post("/accept-invite", authLimiter, acceptInvite);
+router.post("/forgot-password", authLimiter, forgotPassword);
+router.post("/reset-password", authLimiter, resetPassword);
 
 router.get("/admins", requireAuth, listAdmins);
 router.put("/admins/:id/role", requireAuth, updateAdminRole);
