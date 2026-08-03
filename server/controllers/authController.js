@@ -1,13 +1,22 @@
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import Admin from "../models/Admin.js";
+import { sendInviteEmail } from "../utils/mailer.js";
 
 function signToken(admin) {
   return jwt.sign(
     { id: admin._id, email: admin.email, name: admin.name, role: admin.role },
-    process.env.JWT_SECRET || "dev_secret_change_me",
+    process.env.JWT_SECRET,
     { expiresIn: "12h" },
   );
+}
+
+function requireSuperadmin(req, res) {
+  if (req.admin.role !== "superadmin") {
+    res.status(403).json({ message: "Only a superadmin can do this" });
+    return false;
+  }
+  return true;
 }
 
 // POST /api/auth/login
@@ -55,10 +64,15 @@ export async function getMe(req, res) {
   res.json({ admin });
 }
 
-// PUT /api/auth/password
+// PUT /api/auth/password — any logged-in admin changes their own password
 export async function changePassword(req, res) {
   try {
     const { currentPassword, newPassword } = req.body;
+    if (!newPassword || newPassword.length < 8) {
+      return res
+        .status(400)
+        .json({ message: "New password must be at least 8 characters" });
+    }
     const admin = await Admin.findById(req.admin.id);
     if (!admin) return res.status(404).json({ message: "Admin not found" });
 
@@ -76,14 +90,10 @@ export async function changePassword(req, res) {
   }
 }
 
-// POST /api/auth/invite
+// POST /api/auth/invite — superadmin invites a new admin/editor, real email sent
 export async function inviteAdmin(req, res) {
   try {
-    if (req.admin.role !== "superadmin") {
-      return res
-        .status(403)
-        .json({ message: "Only a superadmin can invite new admins" });
-    }
+    if (!requireSuperadmin(req, res)) return;
 
     const { name, email, role } = req.body;
     if (!name || !email) {
@@ -110,19 +120,34 @@ export async function inviteAdmin(req, res) {
       inviteTokenExpires,
     });
 
-    // In production this link would be emailed (e.g. via Nodemailer/SendGrid).
-    // For this mockup, it's returned directly so you can test the flow.
     const inviteLink = `${process.env.CLIENT_URL || "http://localhost:5173"}/admin/accept-invite?token=${inviteToken}`;
 
+    const emailResult = await sendInviteEmail({
+      to: normalizedEmail,
+      name,
+      role: invited.role,
+      inviteLink,
+    });
+
     res.status(201).json({
-      message: "Invite created",
+      message: emailResult.sent
+        ? "Invite sent by email"
+        : "Invite created, but the email could not be sent (see inviteLink below)",
       admin: {
         id: invited._id,
         name: invited.name,
         email: invited.email,
         role: invited.role,
+        status: invited.status,
       },
-      inviteLink,
+      emailSent: emailResult.sent,
+      // Only exposed when email delivery isn't set up (or fails) so you can
+      // still test/complete the flow locally without SMTP configured. Once
+      // SMTP is set up in .env, real invites go out by email and this is
+      // omitted from the response.
+      ...(emailResult.sent
+        ? {}
+        : { inviteLink, emailError: emailResult.reason }),
     });
   } catch (err) {
     res
@@ -131,7 +156,9 @@ export async function inviteAdmin(req, res) {
   }
 }
 
-// POST /api/auth/accept-invite
+// POST /api/auth/accept-invite — single-use: the token is cleared the moment
+// it's accepted, so the same link can never be reused after that, and it also
+// stops working on its own after 48 hours even if never used.
 export async function acceptInvite(req, res) {
   try {
     const { token, password } = req.body;
@@ -154,7 +181,9 @@ export async function acceptInvite(req, res) {
     if (!admin) {
       return res
         .status(400)
-        .json({ message: "Invite link is invalid or has expired" });
+        .json({
+          message: "Invite link is invalid, already used, or has expired",
+        });
     }
 
     admin.password = password; // hashed automatically by the pre('save') hook
@@ -178,5 +207,144 @@ export async function acceptInvite(req, res) {
     res
       .status(500)
       .json({ message: "Failed to accept invite", error: err.message });
+  }
+}
+
+// GET /api/auth/admins — superadmin-only list of every admin/editor account
+export async function listAdmins(req, res) {
+  try {
+    if (!requireSuperadmin(req, res)) return;
+    const admins = await Admin.find()
+      .sort({ createdAt: 1 })
+      .select("-password");
+    res.json(admins);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Failed to fetch admins", error: err.message });
+  }
+}
+
+// PUT /api/auth/admins/:id/role — superadmin changes someone else's role
+export async function updateAdminRole(req, res) {
+  try {
+    if (!requireSuperadmin(req, res)) return;
+
+    const { role } = req.body;
+    if (!["superadmin", "editor"].includes(role)) {
+      return res
+        .status(400)
+        .json({ message: "Role must be superadmin or editor" });
+    }
+    if (req.params.id === req.admin.id) {
+      return res
+        .status(400)
+        .json({ message: "You can't change your own role" });
+    }
+
+    const target = await Admin.findById(req.params.id);
+    if (!target) return res.status(404).json({ message: "Admin not found" });
+
+    if (target.role === "superadmin" && role === "editor") {
+      const superadminCount = await Admin.countDocuments({
+        role: "superadmin",
+      });
+      if (superadminCount <= 1) {
+        return res
+          .status(400)
+          .json({ message: "At least one superadmin must remain" });
+      }
+    }
+
+    target.role = role;
+    await target.save();
+    res.json({
+      message: "Role updated",
+      admin: {
+        id: target._id,
+        name: target.name,
+        email: target.email,
+        role: target.role,
+      },
+    });
+  } catch (err) {
+    res
+      .status(400)
+      .json({ message: "Failed to update role", error: err.message });
+  }
+}
+
+// POST /api/auth/admins/:id/resend-invite — regenerates a fresh 48-hour token
+export async function resendInvite(req, res) {
+  try {
+    if (!requireSuperadmin(req, res)) return;
+
+    const target = await Admin.findById(req.params.id);
+    if (!target) return res.status(404).json({ message: "Admin not found" });
+    if (target.status !== "pending") {
+      return res
+        .status(400)
+        .json({ message: "This admin has already accepted their invite" });
+    }
+
+    target.inviteToken = crypto.randomBytes(32).toString("hex");
+    target.inviteTokenExpires = new Date(Date.now() + 48 * 60 * 60 * 1000);
+    await target.save();
+
+    const inviteLink = `${process.env.CLIENT_URL || "http://localhost:5173"}/admin/accept-invite?token=${target.inviteToken}`;
+    const emailResult = await sendInviteEmail({
+      to: target.email,
+      name: target.name,
+      role: target.role,
+      inviteLink,
+    });
+
+    res.json({
+      message: emailResult.sent
+        ? "Invite re-sent by email"
+        : "Invite refreshed, but the email could not be sent (see inviteLink below)",
+      emailSent: emailResult.sent,
+      ...(emailResult.sent
+        ? {}
+        : { inviteLink, emailError: emailResult.reason }),
+    });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Failed to resend invite", error: err.message });
+  }
+}
+
+// DELETE /api/auth/admins/:id — superadmin revokes an admin/editor's access
+export async function deleteAdmin(req, res) {
+  try {
+    if (!requireSuperadmin(req, res)) return;
+
+    if (req.params.id === req.admin.id) {
+      return res
+        .status(400)
+        .json({ message: "You can't remove your own account" });
+    }
+
+    const target = await Admin.findById(req.params.id);
+    if (!target) return res.status(404).json({ message: "Admin not found" });
+
+    if (target.role === "superadmin") {
+      const superadminCount = await Admin.countDocuments({
+        role: "superadmin",
+      });
+      if (superadminCount <= 1) {
+        return res
+          .status(400)
+          .json({ message: "At least one superadmin must remain" });
+      }
+    }
+
+    await target.deleteOne();
+    res.json({ message: "Admin removed" });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Failed to remove admin", error: err.message });
   }
 }

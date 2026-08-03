@@ -35,6 +35,7 @@ import AdminPlacementPartners from "./pages/admin/AdminPlacementPartners";
 import AdminGallery from "./pages/admin/AdminGallery";
 import AdminMessages from "./pages/admin/AdminMessages";
 import AdminSettings from "./pages/admin/AdminSettings";
+import AdminUsers from './pages/admin/AdminUsers';
 import AdminVisibility from "./pages/admin/AdminVisibility";
 import AdminAcademics from "./pages/admin/AdminAcademics";
 import AdminFAQ from "./pages/admin/AdminFAQ";
@@ -193,6 +194,7 @@ export default function App() {
               <Route path="faq" element={<AdminFAQ />} />
               <Route path="visibility" element={<AdminVisibility />} />
               <Route path="settings" element={<AdminSettings />} />
+              <Route path="users" element={<AdminUsers />} />
             </Route>
             <Route path="/*" element={<PublicSite />} />
           </Routes>

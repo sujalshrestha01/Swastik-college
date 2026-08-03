@@ -5,9 +5,6 @@ import {
   Trash2,
   Link as LinkIcon,
   ToggleLeft,
-  UserPlus,
-  Copy,
-  Check,
   Eye,
   GraduationCap,
   Users,
@@ -20,7 +17,7 @@ import {
   FileDown,
 } from "lucide-react";
 import { Link as RouterLink } from "react-router";
-import { getSettings, updateSettings, inviteAdmin } from "../../api/client";
+import { getSettings, updateSettings } from "../../api/client";
 import {
   Card,
   Field,
@@ -33,7 +30,6 @@ import {
 } from "../../components/admin/Ui";
 import ImageUpload from "../../components/admin/ImageUpload";
 import { useSettings } from "../../context/SettingsContext";
-import { useAuth } from "../../context/AuthContext";
 import HeroCarouselUpload from "../../components/admin/HeroCarouselUpload";
 
 const ICON_OPTIONS = [
@@ -47,97 +43,6 @@ const ICON_OPTIONS = [
   "BookOpenCheck",
 ];
 const COLOR_OPTIONS = ["blue", "emerald", "amber", "rose"];
-
-function InviteAdminPanel() {
-  const { admin } = useAuth();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState("editor");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [inviteLink, setInviteLink] = useState("");
-  const [copied, setCopied] = useState(false);
-
-  if (admin?.role !== "superadmin") return null;
-
-  async function handleInvite(e) {
-    e.preventDefault();
-    setError("");
-    setInviteLink("");
-    setLoading(true);
-    try {
-      const { inviteLink } = await inviteAdmin({ name, email, role });
-      setInviteLink(inviteLink);
-      setName("");
-      setEmail("");
-      setRole("editor");
-    } catch (err) {
-      setError(err.message || "Failed to create invite");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  function copyLink() {
-    navigator.clipboard.writeText(inviteLink);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  }
-
-  return (
-    <Card
-      title="Invite a new admin"
-      description="Only superadmins can invite new admin accounts — there is no public sign-up"
-    >
-      <form onSubmit={handleInvite} className="space-y-4">
-        {error && <Banner type="error">{error}</Banner>}
-        {inviteLink && (
-          <Banner type="success">
-            <div className="flex items-center justify-between gap-3">
-              <span className="break-all">{inviteLink}</span>
-              <Button type="button" variant="secondary" onClick={copyLink}>
-                {copied ? <Check size={16} /> : <Copy size={16} />}
-                {copied ? "Copied" : "Copy"}
-              </Button>
-            </div>
-            <p className="text-xs mt-1 opacity-80">
-              In production this link is emailed automatically. Expires in 48
-              hours.
-            </p>
-          </Banner>
-        )}
-        <div className="grid md:grid-cols-3 gap-4">
-          <Field label="Name">
-            <Input
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Jane Doe"
-            />
-          </Field>
-          <Field label="Email">
-            <Input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="jane@swastikcollege.edu.np"
-            />
-          </Field>
-          <Field label="Role">
-            <Select value={role} onChange={(e) => setRole(e.target.value)}>
-              <option value="editor">Editor</option>
-              <option value="superadmin">Superadmin</option>
-            </Select>
-          </Field>
-        </div>
-        <Button type="submit" disabled={loading}>
-          <UserPlus size={16} /> {loading ? "Sending invite…" : "Send Invite"}
-        </Button>
-      </form>
-    </Card>
-  );
-}
 
 export default function AdminSettings() {
   const { refresh } = useSettings();
@@ -911,7 +816,17 @@ export default function AdminSettings() {
         </Field>
       </Card>
 
-      <InviteAdminPanel />
+      <p className="text-xs text-navy-400 px-2">
+        To invite new admins/editors, change your password, or manage existing
+        accounts, see{" "}
+        <RouterLink
+          to="/admin/users"
+          className="text-marigold-600 font-semibold hover:underline"
+        >
+          User Management
+        </RouterLink>
+        .
+      </p>
 
       <div className="flex justify-end pb-6">
         <Button onClick={handleSave} disabled={saving}>

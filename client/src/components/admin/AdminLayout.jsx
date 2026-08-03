@@ -22,6 +22,7 @@ import {
   HelpCircle,
   FileDown,
   Handshake,
+  UserCog,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
@@ -88,6 +89,7 @@ const navGroups = [
         icon: Eye,
       },
       { to: "/admin/settings", label: "Site Settings", icon: Settings },
+      { to: "/admin/users", label: "User Management", icon: UserCog },
     ],
   },
 ];

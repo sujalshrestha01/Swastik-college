@@ -144,6 +144,21 @@ export function acceptInvite(token, password) {
     body: JSON.stringify({ token, password }),
   });
 }
+export function listAdmins() {
+  return apiCall("/auth/admins");
+}
+export function updateAdminRole(id, role) {
+  return apiCall(`/auth/admins/${id}/role`, {
+    method: "PUT",
+    body: JSON.stringify({ role }),
+  });
+}
+export function resendInvite(id) {
+  return apiCall(`/auth/admins/${id}/resend-invite`, { method: "POST" });
+}
+export function deleteAdmin(id) {
+  return apiCall(`/auth/admins/${id}`, { method: "DELETE" });
+}
 
 // ---------- Admin: Settings ----------
 export function updateSettings(payload) {
