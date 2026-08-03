@@ -1,35 +1,48 @@
-import path from "path";
-import fs from "fs/promises";
 import heicConvert from "heic-convert";
-import { UPLOADS_DIR } from "../middleware/upload.js";
+import cloudinary from "../config/cloudinary.js";
+
+function isHeic(file) {
+  return (
+    /\.(heic|heif)$/i.test(file.originalname) ||
+    ["image/heic", "image/heif"].includes(file.mimetype)
+  );
+}
 
 async function normalizeIfHeic(file) {
-  const isHeic =
-    /\.(heic|heif)$/i.test(file.filename) ||
-    ["image/heic", "image/heif"].includes(file.mimetype);
-  if (!isHeic) {
-    return { filename: file.filename, size: file.size };
-  }
+  if (!isHeic(file)) return file;
+  const outputBuffer = await heicConvert({
+    buffer: file.buffer,
+    format: "JPEG",
+    quality: 0.9,
+  });
+  return {
+    ...file,
+    buffer: outputBuffer,
+    originalname: file.originalname.replace(/\.(heic|heif)$/i, ".jpg"),
+    mimetype: "image/jpeg",
+  };
+}
 
-  const inputPath = path.join(UPLOADS_DIR, file.filename);
-  const parsed = path.parse(file.filename);
-  const newFilename = `${parsed.name}.jpg`;
-  const outputPath = path.join(UPLOADS_DIR, newFilename);
+function uploadBufferToCloudinary(buffer, resourceType) {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: "swastik-college", resource_type: resourceType },
+      (err, result) => (err ? reject(err) : resolve(result)),
+    );
+    stream.end(buffer);
+  });
+}
 
-  try {
-    const inputBuffer = await fs.readFile(inputPath);
-    const outputBuffer = await heicConvert({
-      buffer: inputBuffer,
-      format: "JPEG",
-      quality: 0.9,
-    });
-    await fs.writeFile(outputPath, outputBuffer);
-    await fs.unlink(inputPath).catch(() => {});
-    return { filename: newFilename, size: outputBuffer.length };
-  } catch (err) {
-    await fs.unlink(inputPath).catch(() => {});
-    throw new Error(`Failed to convert HEIC image: ${err.message}`);
-  }
+async function processAndUpload(file) {
+  const normalized = await normalizeIfHeic(file);
+  // PDFs need resource_type 'image' too (Cloudinary serves/thumbnails them
+  // under the image endpoint) — 'auto' lets Cloudinary pick correctly either way.
+  const result = await uploadBufferToCloudinary(normalized.buffer, "auto");
+  return {
+    url: result.secure_url,
+    publicId: result.public_id,
+    size: result.bytes,
+  };
 }
 
 export async function uploadSingle(req, res) {
@@ -37,10 +50,8 @@ export async function uploadSingle(req, res) {
     return res.status(400).json({ message: "No file uploaded" });
   }
   try {
-    const { filename, size } = await normalizeIfHeic(req.file);
-    return res
-      .status(201)
-      .json({ url: `/uploads/${filename}`, filename, size });
+    const result = await processAndUpload(req.file);
+    return res.status(201).json(result);
   } catch (err) {
     return res
       .status(500)
@@ -53,15 +64,7 @@ export async function uploadMultiple(req, res) {
     return res.status(400).json({ message: "No files uploaded" });
   }
   try {
-    const files = await Promise.all(
-      req.files.map((file) =>
-        normalizeIfHeic(file).then(({ filename, size }) => ({
-          url: `/uploads/${filename}`,
-          filename,
-          size,
-        })),
-      ),
-    );
+    const files = await Promise.all(req.files.map(processAndUpload));
     return res.status(201).json({ files });
   } catch (err) {
     return res

@@ -1,4 +1,8 @@
 import Testimonial from "../models/Testimonial.js";
+import {
+  updateWithFileCleanup,
+  deleteWithFileCleanup,
+} from "../utils/fileCleanup.js";
 
 export async function listTestimonials(req, res) {
   try {
@@ -24,13 +28,11 @@ export async function createTestimonial(req, res) {
 
 export async function updateTestimonial(req, res) {
   try {
-    const testimonial = await Testimonial.findByIdAndUpdate(
+    const testimonial = await updateWithFileCleanup(
+      Testimonial,
       req.params.id,
       req.body,
-      {
-        new: true,
-        runValidators: true,
-      },
+      ["photoUrl"],
     );
     if (!testimonial)
       return res.status(404).json({ message: "Testimonial not found" });
@@ -44,7 +46,11 @@ export async function updateTestimonial(req, res) {
 
 export async function deleteTestimonial(req, res) {
   try {
-    const testimonial = await Testimonial.findByIdAndDelete(req.params.id);
+    const testimonial = await deleteWithFileCleanup(
+      Testimonial,
+      req.params.id,
+      ["photoUrl"],
+    );
     if (!testimonial)
       return res.status(404).json({ message: "Testimonial not found" });
     res.json({ message: "Testimonial deleted" });

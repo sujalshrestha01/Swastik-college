@@ -1,4 +1,8 @@
 import Blog from "../models/Blog.js";
+import {
+  updateWithFileCleanup,
+  deleteWithFileCleanup,
+} from "../utils/fileCleanup.js";
 
 const createSlug = (title) =>
   title
@@ -69,10 +73,12 @@ export async function createBlog(req, res) {
 // PUT /api/blogs/:id — admin only
 export async function updateBlog(req, res) {
   try {
-    const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const updatedBlog = await updateWithFileCleanup(
+      Blog,
+      req.params.id,
+      req.body,
+      ["imageUrl"],
+    );
     if (!updatedBlog)
       return res.status(404).json({ message: "Blog post not found" });
     res.json(updatedBlog);
@@ -86,7 +92,9 @@ export async function updateBlog(req, res) {
 // DELETE /api/blogs/:id — admin only
 export async function deleteBlog(req, res) {
   try {
-    const deletedBlog = await Blog.findByIdAndDelete(req.params.id);
+    const deletedBlog = await deleteWithFileCleanup(Blog, req.params.id, [
+      "imageUrl",
+    ]);
     if (!deletedBlog)
       return res.status(404).json({ message: "Blog post not found" });
     res.json({ message: "Blog post deleted successfully" });

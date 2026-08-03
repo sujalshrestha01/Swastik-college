@@ -1,4 +1,6 @@
 import GalleryEvent from "../models/Gallery.js";
+import { deleteUploadedFile } from "../utils/cloudinaryHelpers.js";
+import { deleteRemovedArrayFiles } from "../utils/fileCleanup.js";
 
 // GET /api/gallery — public
 export async function listGalleryEvents(req, res) {
@@ -57,6 +59,19 @@ export async function createGalleryEvent(req, res) {
 // PUT /api/gallery/:id — admin only
 export async function updateGalleryEvent(req, res) {
   try {
+    const existing = await GalleryEvent.findById(req.params.id);
+    if (!existing)
+      return res.status(404).json({ message: "Gallery event not found" });
+
+    // The admin form submits the whole images array each save — any image
+    // that was on the album before but isn't in the new array was removed
+    // (or replaced), so its file is no longer referenced anywhere.
+    if (Array.isArray(req.body.images)) {
+      const oldUrls = existing.images.map((img) => img.url);
+      const newUrls = req.body.images.map((img) => img.url);
+      await deleteRemovedArrayFiles(oldUrls, newUrls);
+    }
+
     const event = await GalleryEvent.findByIdAndUpdate(
       req.params.id,
       req.body,
@@ -81,6 +96,11 @@ export async function deleteGalleryEvent(req, res) {
     const event = await GalleryEvent.findByIdAndDelete(req.params.id);
     if (!event)
       return res.status(404).json({ message: "Gallery event not found" });
+
+    // Cascade: an album's photos aren't referenced anywhere else once the
+    // album itself is gone.
+    await Promise.all(event.images.map((img) => deleteUploadedFile(img.url)));
+
     res.json({ message: "Gallery event deleted" });
   } catch (err) {
     res

@@ -1,4 +1,8 @@
 import Notice from "../models/Notice.js";
+import {
+  updateWithFileCleanup,
+  deleteWithFileCleanup,
+} from "../utils/fileCleanup.js";
 
 export async function listNotices(req, res) {
   try {
@@ -41,10 +45,12 @@ export async function createNotice(req, res) {
 
 export async function updateNotice(req, res) {
   try {
-    const notice = await Notice.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const notice = await updateWithFileCleanup(
+      Notice,
+      req.params.id,
+      req.body,
+      ["fileUrl"],
+    );
     if (!notice) return res.status(404).json({ message: "Notice not found" });
     res.json(notice);
   } catch (err) {
@@ -56,7 +62,9 @@ export async function updateNotice(req, res) {
 
 export async function deleteNotice(req, res) {
   try {
-    const notice = await Notice.findByIdAndDelete(req.params.id);
+    const notice = await deleteWithFileCleanup(Notice, req.params.id, [
+      "fileUrl",
+    ]);
     if (!notice) return res.status(404).json({ message: "Notice not found" });
     res.json({ message: "Notice deleted" });
   } catch (err) {

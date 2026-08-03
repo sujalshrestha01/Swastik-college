@@ -1,4 +1,8 @@
 import Course from "../models/Course.js";
+import {
+  updateWithFileCleanup,
+  deleteWithFileCleanup,
+} from "../utils/fileCleanup.js";
 
 export async function listCourses(req, res) {
   try {
@@ -44,13 +48,11 @@ export async function createCourse(req, res) {
 
 export async function updateCourse(req, res) {
   try {
-    const course = await Course.findOneAndUpdate(
+    const course = await updateWithFileCleanup(
+      Course,
       { slug: req.params.slug },
       req.body,
-      {
-        new: true,
-        runValidators: true,
-      },
+      ["syllabusUrl"],
     );
     if (!course) return res.status(404).json({ message: "Course not found" });
     res.json(course);
@@ -63,7 +65,11 @@ export async function updateCourse(req, res) {
 
 export async function deleteCourse(req, res) {
   try {
-    const course = await Course.findOneAndDelete({ slug: req.params.slug });
+    const course = await deleteWithFileCleanup(
+      Course,
+      { slug: req.params.slug },
+      ["syllabusUrl"],
+    );
     if (!course) return res.status(404).json({ message: "Course not found" });
     res.json({ message: "Course deleted" });
   } catch (err) {

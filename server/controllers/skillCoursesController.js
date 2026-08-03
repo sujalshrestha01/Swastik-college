@@ -1,4 +1,8 @@
 import SkillCourse from "../models/SkillCourse.js";
+import {
+  updateWithFileCleanup,
+  deleteWithFileCleanup,
+} from "../utils/fileCleanup.js";
 
 export async function listSkillCourses(req, res) {
   try {
@@ -24,10 +28,11 @@ export async function createSkillCourse(req, res) {
 
 export async function updateSkillCourse(req, res) {
   try {
-    const course = await SkillCourse.findByIdAndUpdate(
+    const course = await updateWithFileCleanup(
+      SkillCourse,
       req.params.id,
       req.body,
-      { new: true, runValidators: true },
+      ["logoUrl"],
     );
     if (!course)
       return res.status(404).json({ message: "Skill course not found" });
@@ -41,7 +46,9 @@ export async function updateSkillCourse(req, res) {
 
 export async function deleteSkillCourse(req, res) {
   try {
-    const course = await SkillCourse.findByIdAndDelete(req.params.id);
+    const course = await deleteWithFileCleanup(SkillCourse, req.params.id, [
+      "logoUrl",
+    ]);
     if (!course)
       return res.status(404).json({ message: "Skill course not found" });
     res.json({ message: "Skill course deleted" });

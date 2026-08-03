@@ -49,7 +49,7 @@ app.use(
   "/api",
   rateLimit({
     windowMs: 15 * 60 * 1000,
-    limit: 300,
+    limit: 3000,
     standardHeaders: true,
     legacyHeaders: false,
     message: { message: "Too many requests — please try again later." },
@@ -57,14 +57,15 @@ app.use(
 );
 
 // Serve locally uploaded images (faculty photos, hero images, gallery photos, etc.)
-app.use(
-  "/uploads",
-  (req, res, next) => {
-    res.set("Cross-Origin-Resource-Policy", "cross-origin");
-    next();
-  },
-  express.static(path.join(__dirname, "uploads")),
-);
+//need to remove once cloudinary is implemented for all images
+// app.use(
+//   "/uploads",
+//   (req, res, next) => {
+//     res.set("Cross-Origin-Resource-Policy", "cross-origin");
+//     next();
+//   },
+//   express.static(path.join(__dirname, "uploads")),
+// );
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", service: "swastik-college-api" });

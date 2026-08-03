@@ -1,4 +1,8 @@
 import Faculty from "../models/Faculty.js";
+import {
+  updateWithFileCleanup,
+  deleteWithFileCleanup,
+} from "../utils/fileCleanup.js";
 
 export async function listFaculty(req, res) {
   try {
@@ -24,10 +28,12 @@ export async function createFaculty(req, res) {
 
 export async function updateFaculty(req, res) {
   try {
-    const member = await Faculty.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const member = await updateWithFileCleanup(
+      Faculty,
+      req.params.id,
+      req.body,
+      ["photoUrl"],
+    );
     if (!member)
       return res.status(404).json({ message: "Faculty member not found" });
     res.json(member);
@@ -40,7 +46,9 @@ export async function updateFaculty(req, res) {
 
 export async function deleteFaculty(req, res) {
   try {
-    const member = await Faculty.findByIdAndDelete(req.params.id);
+    const member = await deleteWithFileCleanup(Faculty, req.params.id, [
+      "photoUrl",
+    ]);
     if (!member)
       return res.status(404).json({ message: "Faculty member not found" });
     res.json({ message: "Faculty member deleted" });

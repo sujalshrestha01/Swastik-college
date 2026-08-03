@@ -1,4 +1,6 @@
 import SiteSettings from "../models/SiteSettings.js";
+import { deleteUploadedFile } from "../utils/cloudinaryHelpers.js";
+import { deleteRemovedArrayFiles } from "../utils/fileCleanup.js";
 
 // The full catalogue of pages + toggleable sections inside each page.
 // This drives BOTH the admin "Page & Section Visibility" screen and acts as
@@ -153,8 +155,29 @@ export function getVisibilitySchema(req, res) {
 }
 
 // PUT /api/settings — admin only
+// PUT /api/settings — admin only
 export async function updateSettings(req, res) {
   try {
+    const existing = await getOrCreateSettings();
+
+    // Single-file fields: if replaced or cleared, delete the old file.
+    for (const field of ["logoUrl", "heroImageUrl"]) {
+      if (
+        field in req.body &&
+        req.body[field] !== existing[field] &&
+        existing[field]
+      ) {
+        await deleteUploadedFile(existing[field]);
+      }
+    }
+    // heroImages is a full array replaced on each save — same diffing as Gallery.
+    if (Array.isArray(req.body.heroImages)) {
+      await deleteRemovedArrayFiles(
+        existing.heroImages || [],
+        req.body.heroImages,
+      );
+    }
+
     const updatedSettings = await SiteSettings.findOneAndUpdate(
       { key: "main" },
       { $set: req.body },

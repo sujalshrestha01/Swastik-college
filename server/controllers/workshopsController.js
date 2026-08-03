@@ -1,4 +1,8 @@
 import Workshop from "../models/Workshop.js";
+import {
+  updateWithFileCleanup,
+  deleteWithFileCleanup,
+} from "../utils/fileCleanup.js";
 
 export async function listWorkshops(req, res) {
   try {
@@ -28,10 +32,12 @@ export async function createWorkshop(req, res) {
 
 export async function updateWorkshop(req, res) {
   try {
-    const workshop = await Workshop.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const workshop = await updateWithFileCleanup(
+      Workshop,
+      req.params.id,
+      req.body,
+      ["logoUrl"],
+    );
     if (!workshop)
       return res.status(404).json({ message: "Workshop not found" });
     res.json(workshop);
@@ -44,7 +50,9 @@ export async function updateWorkshop(req, res) {
 
 export async function deleteWorkshop(req, res) {
   try {
-    const workshop = await Workshop.findByIdAndDelete(req.params.id);
+    const workshop = await deleteWithFileCleanup(Workshop, req.params.id, [
+      "logoUrl",
+    ]);
     if (!workshop)
       return res.status(404).json({ message: "Workshop not found" });
     res.json({ message: "Workshop deleted" });

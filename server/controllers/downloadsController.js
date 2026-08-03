@@ -1,4 +1,8 @@
 import Download from "../models/Download.js";
+import {
+  updateWithFileCleanup,
+  deleteWithFileCleanup,
+} from "../utils/fileCleanup.js";
 
 export async function listDownloads(req, res) {
   try {
@@ -36,10 +40,12 @@ export async function createDownload(req, res) {
 
 export async function updateDownload(req, res) {
   try {
-    const item = await Download.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const item = await updateWithFileCleanup(
+      Download,
+      req.params.id,
+      req.body,
+      ["fileUrl"],
+    );
     if (!item) return res.status(404).json({ message: "Download not found" });
     res.json(item);
   } catch (err) {
@@ -51,7 +57,9 @@ export async function updateDownload(req, res) {
 
 export async function deleteDownload(req, res) {
   try {
-    const item = await Download.findByIdAndDelete(req.params.id);
+    const item = await deleteWithFileCleanup(Download, req.params.id, [
+      "fileUrl",
+    ]);
     if (!item) return res.status(404).json({ message: "Download not found" });
     res.json({ message: "Download deleted" });
   } catch (err) {

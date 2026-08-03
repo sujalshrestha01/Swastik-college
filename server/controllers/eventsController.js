@@ -1,4 +1,8 @@
 import Event from "../models/Event.js";
+import {
+  updateWithFileCleanup,
+  deleteWithFileCleanup,
+} from "../utils/fileCleanup.js";
 
 export async function listEvents(req, res) {
   try {
@@ -24,10 +28,9 @@ export async function createEvent(req, res) {
 
 export async function updateEvent(req, res) {
   try {
-    const event = await Event.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const event = await updateWithFileCleanup(Event, req.params.id, req.body, [
+      "imageUrl",
+    ]);
     if (!event) return res.status(404).json({ message: "Event not found" });
     res.json(event);
   } catch (err) {
@@ -39,7 +42,9 @@ export async function updateEvent(req, res) {
 
 export async function deleteEvent(req, res) {
   try {
-    const event = await Event.findByIdAndDelete(req.params.id);
+    const event = await deleteWithFileCleanup(Event, req.params.id, [
+      "imageUrl",
+    ]);
     if (!event) return res.status(404).json({ message: "Event not found" });
     res.json({ message: "Event deleted" });
   } catch (err) {
