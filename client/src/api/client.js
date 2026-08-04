@@ -32,6 +32,74 @@ export function resolveImageUrl(path) {
   return `${SERVER_ORIGIN}${path.startsWith("/") ? "" : "/"}${path}`;
 }
 
+// Cross-origin URLs (e.g. Cloudinary) ignore the HTML `download` attribute —
+// browsers just navigate to them instead of downloading (PDFs open inline
+// in the viewer instead of saving). Cloudinary's `fl_attachment` flag is
+// meant to fix this by making Cloudinary send `Content-Disposition:
+// attachment`, but it's unreliable for PDFs stored under the "image"
+// resource type (can return a malformed/invalid response). Instead, fetch
+// the file as a blob in the browser and save that — this works regardless
+// of cross-origin restrictions, since the resulting blob: URL is always
+// same-origin from the browser's point of view.
+export async function downloadFile(path, filename) {
+  const url = resolveImageUrl(path);
+  if (!url) return;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Download failed: ${res.status}`);
+  const blob = await res.blob();
+  const blobUrl = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = blobUrl;
+  a.download = filename || url.split("/").pop().split("?")[0] || "download";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(blobUrl);
+}
+
+// Opens a file for viewing the same reliable way downloadFile() saves it:
+// fetch the actual bytes as a blob, then hand the browser a blob: URL to
+// render. Navigating straight to the Cloudinary URL can hit odd content-type
+// / inline-rendering behavior on some PDFs ("We can't open this file"); a
+// blob URL is served by the browser itself from bytes it already verified,
+// so it renders in the native PDF viewer reliably every time.
+// IMPORTANT: must call window.open() synchronously in the click handler
+// (before the await) to avoid popup blockers — we open a blank tab first,
+// then set its location once the blob is ready.
+export async function previewFile(path) {
+  const url = resolveImageUrl(path);
+  if (!url) return;
+  const tab = window.open("", "_blank");
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Preview failed: ${res.status}`);
+    const blob = await res.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    if (tab) tab.location.href = blobUrl;
+  } catch (err) {
+    // Fall back to the direct link if the fetch itself fails (e.g. offline)
+    if (tab) tab.location.href = url;
+    throw err;
+  }
+}
+
+// Cloudinary can rasterize page 1 of a stored PDF into a JPG on its own
+// servers — no client-side PDF rendering needed. This replaces relying on
+// react-pdf/pdf.js in the browser (which needs its own worker script from a
+// CDN and can fail on version mismatches or CORS on range-requests). Only
+// works for Cloudinary-hosted PDFs; anything else falls back to null so the
+// caller can show a generic file icon instead.
+export function getPdfThumbnailUrl(path) {
+  const url = resolveImageUrl(path);
+  if (!url || !/res\.cloudinary\.com/i.test(url)) return null;
+  if (!/\.pdf($|\?)/i.test(url)) return null;
+  // Insert a transformation right after /upload/: grab page 1, fit to a
+  // reasonable thumbnail width, convert to jpg.
+  return url
+    .replace(/\/upload\//, "/upload/pg_1,w_400,c_fit,f_jpg,q_auto/")
+    .replace(/\.pdf($|\?)/i, ".jpg$1");
+}
+
 async function safeFetch(path, fallback, options) {
   try {
     const res = await fetch(`${BASE_URL}${path}`, options);

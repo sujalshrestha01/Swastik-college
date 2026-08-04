@@ -5,7 +5,12 @@ import {
   FileText,
   FolderDown,
 } from "lucide-react";
-import { getDownloads, resolveImageUrl } from "../api/client";
+import {
+  getDownloads,
+  resolveImageUrl,
+  downloadFile,
+  previewFile,
+} from "../api/client";
 import { Section } from "../components/Visibility";
 import { PdfThumbnail } from "../components/PdfThumbnail";
 
@@ -23,6 +28,28 @@ export default function Downloads() {
   const [items, setItems] = useState([]);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
+  const [downloadingId, setDownloadingId] = useState(null);
+
+  async function handleDownload(item) {
+    setDownloadingId(item._id);
+    try {
+      await downloadFile(item.fileUrl, item.title);
+    } catch (err) {
+      console.error("Download failed:", err.message);
+      // Fallback: open the file directly so the user can save it manually
+      window.open(resolveImageUrl(item.fileUrl), "_blank", "noreferrer");
+    } finally {
+      setDownloadingId(null);
+    }
+  }
+
+  function handlePreview(item) {
+    // Must fire synchronously on click (not awaited first) so the browser
+    // doesn't treat the new tab as an unrequested popup.
+    previewFile(item.fileUrl).catch((err) =>
+      console.error("Preview failed:", err.message),
+    );
+  }
 
   useEffect(() => {
     getDownloads().then(setItems);
@@ -107,8 +134,13 @@ export default function Downloads() {
                 key={d._id}
                 className="flex flex-col justify-between p-2.5 rounded-lg border border-transparent hover:border-b-[#D9383A] border-b-2 dark:hover:border-b-[#3B82F6] bg-white dark:bg-navy-800 shadow-xs hover:shadow-md transition-all group overflow-hidden"
               >
-                {/* Large Preview Area (~Half the card size) */}
-                <div className="w-full h-32 flex items-center justify-center overflow-hidden rounded-md bg-navy-50/60 dark:bg-navy-900/60 mb-2">
+                {/* Large Preview Area — click to view/open in a new tab */}
+                <button
+                  type="button"
+                  onClick={() => handlePreview(d)}
+                  className="w-full h-32 flex items-center justify-center overflow-hidden rounded-md bg-navy-50/60 dark:bg-navy-900/60 mb-2 cursor-pointer"
+                  title={`Preview ${d.title}`}
+                >
                   {isPdf ? (
                     <PdfThumbnail url={fileUrl} />
                   ) : isImage ? (
@@ -125,7 +157,7 @@ export default function Downloads() {
                       </span>
                     </div>
                   )}
-                </div>
+                </button>
 
                 {/* Bottom Info & Download Button */}
                 <div className="flex flex-col gap-1.5 min-w-0">
@@ -135,15 +167,15 @@ export default function Downloads() {
                   >
                     {d.title}
                   </h3>
-                  <a
-                    href={fileUrl}
-                    download
-                    target="_blank"
-                    rel="noreferrer"
-                    className="w-full inline-flex items-center justify-center gap-1 text-[11px] font-medium text-navy-600 dark:text-navy-100 border border-navy-100 dark:border-navy-700 py-1.5 rounded-md hover:bg-[#D9383A] hover:text-white dark:hover:bg-[#1E3A8A] dark:hover:text-white hover:border-transparent transition-colors"
+                  <button
+                    type="button"
+                    onClick={() => handleDownload(d)}
+                    disabled={downloadingId === d._id}
+                    className="w-full inline-flex items-center justify-center gap-1 text-[11px] font-medium text-navy-600 dark:text-navy-100 border border-navy-100 dark:border-navy-700 py-1.5 rounded-md hover:bg-[#D9383A] hover:text-white dark:hover:bg-[#1E3A8A] dark:hover:text-white hover:border-transparent transition-colors disabled:opacity-60"
                   >
-                    <DownloadIcon size={12} /> Download
-                  </a>
+                    <DownloadIcon size={12} />
+                    {downloadingId === d._id ? "Downloading…" : "Download"}
+                  </button>
                 </div>
               </div>
             );

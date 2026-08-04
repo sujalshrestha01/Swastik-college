@@ -2,11 +2,17 @@ import { useEffect, useMemo, useState } from "react";
 import {
   Search,
   Download,
+  Eye,
   Bell,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { getNotices, resolveImageUrl } from "../api/client";
+import {
+  getNotices,
+  resolveImageUrl,
+  downloadFile,
+  previewFile,
+} from "../api/client";
 import { Section } from "../components/Visibility";
 
 const CATEGORIES = ["All", "Exams", "Admissions", "Events", "General"];
@@ -23,10 +29,31 @@ export default function NoticeBoard() {
   const [notices, setNotices] = useState([]);
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
+  const [downloadingId, setDownloadingId] = useState(null);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const noticesPerPage = 5;
+
+  async function handleDownload(notice) {
+    setDownloadingId(notice._id);
+    try {
+      await downloadFile(notice.fileUrl, notice.title);
+    } catch (err) {
+      console.error("Download failed:", err.message);
+      window.open(resolveImageUrl(notice.fileUrl), "_blank", "noreferrer");
+    } finally {
+      setDownloadingId(null);
+    }
+  }
+
+  function handlePreview(notice) {
+    // Must fire synchronously on click (not awaited first) so the browser
+    // doesn't treat the new tab as an unrequested popup.
+    previewFile(notice.fileUrl).catch((err) =>
+      console.error("Preview failed:", err.message),
+    );
+  }
 
   useEffect(() => {
     getNotices().then(setNotices);
@@ -128,7 +155,18 @@ export default function NoticeBoard() {
                 </div>
 
                 <h3 className="font-medium text-navy dark:text-paper text-sm group-hover:text-[#D9383A] dark:group-hover:text-[#3B82F6] transition-colors">
-                  {n.title}
+                  {n.fileUrl ? (
+                    <button
+                      type="button"
+                      onClick={() => handlePreview(n)}
+                      className="hover:underline text-left"
+                      title={`Preview ${n.title}`}
+                    >
+                      {n.title}
+                    </button>
+                  ) : (
+                    n.title
+                  )}
                 </h3>
 
                 <p className="text-xs text-navy-400 dark:text-navy-300 mt-1.5">
@@ -137,16 +175,25 @@ export default function NoticeBoard() {
               </div>
 
               {n.fileUrl && (
-                <a
-                  href={resolveImageUrl(n.fileUrl)}
-                  download
-                  target="_blank"
-                  rel="noreferrer"
-                  className="shrink-0 inline-flex items-center gap-1.5 text-xs font-medium text-navy-600 dark:text-navy-100 border border-navy-100 dark:border-navy-700 px-3.5 py-2 rounded-full hover:border-[#D9383A] dark:hover:border-[#1E3A8A] hover:text-[#D9383A] dark:hover:text-[#3B82F6] transition-colors"
-                >
-                  <Download size={14} />
-                  Download
-                </a>
+                <div className="shrink-0 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handlePreview(n)}
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-navy-600 dark:text-navy-100 border border-navy-100 dark:border-navy-700 px-3.5 py-2 rounded-full hover:border-[#D9383A] dark:hover:border-[#1E3A8A] hover:text-[#D9383A] dark:hover:text-[#3B82F6] transition-colors"
+                  >
+                    <Eye size={14} />
+                    View
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDownload(n)}
+                    disabled={downloadingId === n._id}
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-navy-600 dark:text-navy-100 border border-navy-100 dark:border-navy-700 px-3.5 py-2 rounded-full hover:border-[#D9383A] dark:hover:border-[#1E3A8A] hover:text-[#D9383A] dark:hover:text-[#3B82F6] transition-colors disabled:opacity-60"
+                  >
+                    <Download size={14} />
+                    {downloadingId === n._id ? "Downloading…" : "Download"}
+                  </button>
+                </div>
               )}
             </div>
           ))}
