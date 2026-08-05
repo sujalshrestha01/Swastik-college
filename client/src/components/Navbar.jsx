@@ -39,9 +39,18 @@ export default function Navbar() {
         <Link
           to="/"
           className="flex items-center gap-2 shrink-0"
-          onClick={() => {
+          onClick={(e) => {
             setOpen(false);
-            window.location.reload();
+
+            // If already on the home page, scroll smoothly to the top
+            if (window.location.pathname === "/") {
+              e.preventDefault();
+
+              window.scrollTo({
+                top: 0,
+                behavior: "smooth",
+              });
+            }
           }}
         >
           <img
