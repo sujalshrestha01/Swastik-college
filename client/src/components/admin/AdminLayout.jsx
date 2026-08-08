@@ -345,9 +345,9 @@ function LiveChatStatusControls() {
   }
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-2 sm:gap-4">
       <div
-        className="hidden sm:flex items-center gap-2"
+        className="flex items-center gap-1.5 sm:gap-2"
         title="When off, students asking for a human are told immediately that no admin is available — no 5-minute wait."
       >
         {admin.available ? (
@@ -355,7 +355,9 @@ function LiveChatStatusControls() {
         ) : (
           <UserX size={15} className="text-navy-400" />
         )}
-        <span className="text-xs font-medium text-navy-600">Available</span>
+        <span className="hidden sm:inline text-xs font-medium text-navy-600">
+          Available
+        </span>
         <Switch
           checked={!!admin.available}
           disabled={busy === "available"}
@@ -363,7 +365,7 @@ function LiveChatStatusControls() {
         />
       </div>
       <div
-        className="hidden sm:flex items-center gap-2"
+        className="flex items-center gap-1.5 sm:gap-2"
         title="Get notified when a student needs an admin, even with this tab or browser closed."
       >
         {admin.notificationsEnabled ? (
@@ -371,7 +373,9 @@ function LiveChatStatusControls() {
         ) : (
           <BellOff size={15} className="text-navy-400" />
         )}
-        <span className="text-xs font-medium text-navy-600">Notifications</span>
+        <span className="hidden sm:inline text-xs font-medium text-navy-600">
+          Notifications
+        </span>
         <Switch
           checked={!!admin.notificationsEnabled}
           disabled={busy === "notifications"}
