@@ -40,6 +40,18 @@ function anyAdminAvailable() {
   return Admin.exists({ status: "active", available: true });
 }
 
+// Fire-and-forget in-app alert (sound/badge) for a connected admin's open
+// tab — the socket-side counterpart to pushNotify() below, which only
+// handles the tab-closed/browser-closed case. Both are needed: push alone
+// misses admins who are logged in but just not looking at Live Chat right
+// now, since Socket.io delivers instantly to an open tab with zero setup,
+// while push is the only way to reach a closed browser.
+function alertAdmins(adminNsp, adminIds, payload) {
+  for (const id of adminIds) {
+    adminNsp.to(`admin:${id}`).emit("admin:alert", payload);
+  }
+}
+
 // Fire-and-forget push notify — never let a push failure break the chat flow.
 function pushNotify(admins, payload) {
   notifyAdmins(admins, payload).catch((err) =>
@@ -157,15 +169,30 @@ export function initChatSocket(io) {
             const admin = await findNotifiableAdminById(
               conversation.assignedAdmin,
             );
-            if (admin) {
+            const alertPayload = {
+              conversationId: String(conversation._id),
+              studentName: conversation.studentName,
+              lastMessagePreview: studentMessage.text.slice(0, 140),
+            };
+            alertAdmins(adminNsp, [conversation.assignedAdmin], alertPayload);
+            if (admin)
               pushNotify([admin], {
                 title: conversation.studentName || "New message",
                 body: studentMessage.text.slice(0, 120),
                 conversationId: String(conversation._id),
               });
-            }
           } else if (conversation.status === "WAITING_FOR_ADMIN") {
             const admins = await findNotifiableAdmins();
+            const alertPayload = {
+              conversationId: String(conversation._id),
+              studentName: conversation.studentName,
+              lastMessagePreview: studentMessage.text.slice(0, 140),
+            };
+            alertAdmins(
+              adminNsp,
+              admins.map((a) => a._id),
+              alertPayload,
+            );
             pushNotify(admins, {
               title: "Student waiting for a reply",
               body: studentMessage.text.slice(0, 120),
@@ -327,6 +354,9 @@ export function initChatSocket(io) {
 
   adminNsp.on("connection", (socket) => {
     socket.join(ADMIN_INBOX_ROOM);
+    // Personal room so a specific admin can be alerted/pushed to regardless
+    // of how many tabs/devices they have open — used by alertAdmins() above.
+    socket.join(`admin:${socket.admin.id}`);
 
     socket.on("admin:join_inbox", async () => {
       const waiting = await ChatConversation.find({

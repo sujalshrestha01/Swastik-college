@@ -420,8 +420,15 @@ export default function AdminLayout() {
         preview: item.lastMessagePreview,
       });
     }
+    // Fires on every follow-up message too (not just the first escalation)
+    // — see server/sockets/chatSocket.js alertAdmins(). Same handler as
+    // above since the payload shape matches.
     socket.on("admin:escalation", handleEscalation);
-    return () => socket.off("admin:escalation", handleEscalation);
+    socket.on("admin:alert", handleEscalation);
+    return () => {
+      socket.off("admin:escalation", handleEscalation);
+      socket.off("admin:alert", handleEscalation);
+    };
   }, [admin]);
 
   useEffect(() => {
