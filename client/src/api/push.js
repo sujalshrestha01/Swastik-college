@@ -47,13 +47,15 @@ export async function enablePushNotifications() {
 
   const registration = await registerServiceWorker();
   const ready = await navigator.serviceWorker.ready;
+
   const existing = await ready.pushManager.getSubscription();
-  const subscription =
-    existing ||
-    (await (registration || ready).pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(publicKey),
-    }));
+  if (existing) {
+    await existing.unsubscribe();
+  }
+  const subscription = await (registration || ready).pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(publicKey),
+  });
 
   await subscribePush(subscription.toJSON());
   return { ok: true };

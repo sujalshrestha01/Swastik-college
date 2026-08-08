@@ -42,7 +42,12 @@ async function sendToAdmin(admin, payload) {
           JSON.stringify(payload),
         );
       } catch (err) {
-        if (err.statusCode === 410 || err.statusCode === 404) {
+        if (
+          err.statusCode === 410 ||
+          err.statusCode === 404 ||
+          err.statusCode === 401 ||
+          err.statusCode === 403
+        ) {
           deadEndpoints.push(sub.endpoint);
         } else {
           console.error(
