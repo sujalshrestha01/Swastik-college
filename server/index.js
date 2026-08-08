@@ -27,6 +27,7 @@ import workshopsRouter from "./routes/workshops.js";
 import faqRouter from "./routes/faq.js";
 import knowledgeRouter from "./routes/knowledge.js";
 import chatRouter from "./routes/chat.js";
+import adminPushRouter from "./routes/adminPush.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -94,6 +95,7 @@ app.use("/api/workshops", workshopsRouter);
 app.use("/api/faqs", faqRouter);
 app.use("/api/knowledge", knowledgeRouter);
 app.use("/api/chat", chatRouter);
+app.use("/api/admin-push", adminPushRouter);
 
 // 404 handler for unknown API routes
 app.use("/api", (req, res) => {

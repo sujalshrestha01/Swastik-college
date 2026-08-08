@@ -46,9 +46,22 @@ export function AuthProvider({ children }) {
     setAdmin(null);
   }
 
+  // Merges a partial update into the current admin (e.g. after toggling
+  // "Available" or "Notifications") without a full re-fetch.
+  function updateAdmin(partial) {
+    setAdmin((prev) => (prev ? { ...prev, ...partial } : prev));
+  }
+
   return (
     <AuthContext.Provider
-      value={{ admin, loading, login, logout, isAuthenticated: !!admin }}
+      value={{
+        admin,
+        loading,
+        login,
+        logout,
+        updateAdmin,
+        isAuthenticated: !!admin,
+      }}
     >
       {children}
     </AuthContext.Provider>

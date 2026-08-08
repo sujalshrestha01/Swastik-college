@@ -377,6 +377,29 @@ export function deleteKnowledgeDoc(id) {
 // ---------- Chat with Admissions — conversation history (admin dashboard) ----------
 // Real-time messaging itself happens over Socket.io (see api/chatSocket.js);
 // these two just power the admin's inbox list + "load past messages" views.
+// ---------- Admin live-chat push notifications & availability ----------
+export function getVapidPublicKey() {
+  return apiCall("/admin-push/vapid-public-key");
+}
+export function subscribePush(subscription) {
+  return apiCall("/admin-push/subscribe", {
+    method: "POST",
+    body: JSON.stringify({ subscription }),
+  });
+}
+export function unsubscribePush(endpoint) {
+  return apiCall("/admin-push/unsubscribe", {
+    method: "POST",
+    body: JSON.stringify({ endpoint }),
+  });
+}
+export function updateChatPreferences(payload) {
+  return apiCall("/admin-push/preferences", {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+}
+
 export function getConversations(status) {
   const qs = status ? `?status=${status}` : "";
   return apiCall(`/chat/conversations${qs}`);

@@ -1,14 +1,20 @@
 import jwt from "jsonwebtoken";
 import ChatConversation from "../models/ChatConversation.js";
 import ChatMessage from "../models/ChatMessage.js";
+import Admin from "../models/Admin.js";
 import { answerStudentQuestion } from "../services/ragService.js";
 import { wantsHumanAdmin } from "../services/intentService.js";
+import {
+  notifyAdmins,
+  findNotifiableAdmins,
+  findNotifiableAdminById,
+} from "../utils/webPush.js";
 
 const ADMIN_INBOX_ROOM = "admin:inbox";
 const HOLDING_MESSAGE =
-  "Connecting you to an admission officer — someone will be with you shortly.";
+  "Connecting you to an admin — someone will be with you shortly.";
 const NO_ADMIN_MESSAGE =
-  "Our admissions team isn't available right now. If you'd like a callback, just type your email address and we'll follow up. Otherwise, feel free to keep asking me questions in the meantime.";
+  "Our admin isn't available right now feel free to call us in office hour . Otherwise,If you have any question you can ask me.";
 const EMAIL_CAPTURED_MESSAGE =
   "Got it — we'll follow up at that email soon. Feel free to keep asking me questions too.";
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -28,6 +34,17 @@ function clearHandoffTimer(conversationId) {
 
 function conversationRoom(sessionId) {
   return `conv:${sessionId}`;
+}
+
+function anyAdminAvailable() {
+  return Admin.exists({ status: "active", available: true });
+}
+
+// Fire-and-forget push notify — never let a push failure break the chat flow.
+function pushNotify(admins, payload) {
+  notifyAdmins(admins, payload).catch((err) =>
+    console.error("[chatSocket] push notify failed:", err.message),
+  );
 }
 
 function broadcastToConversation(io, adminNsp, sessionId, event, payload) {
@@ -133,6 +150,28 @@ export function initChatSocket(io) {
           conversation.status === "ADMIN" ||
           conversation.status === "WAITING_FOR_ADMIN"
         ) {
+          // Re-notify so an admin who closed their tab still hears about
+          // follow-up messages — for an assigned chat, just that admin; for
+          // one still in the waiting queue, everyone with notifications on.
+          if (conversation.status === "ADMIN" && conversation.assignedAdmin) {
+            const admin = await findNotifiableAdminById(
+              conversation.assignedAdmin,
+            );
+            if (admin) {
+              pushNotify([admin], {
+                title: conversation.studentName || "New message",
+                body: studentMessage.text.slice(0, 120),
+                conversationId: String(conversation._id),
+              });
+            }
+          } else if (conversation.status === "WAITING_FOR_ADMIN") {
+            const admins = await findNotifiableAdmins();
+            pushNotify(admins, {
+              title: "Student waiting for a reply",
+              body: studentMessage.text.slice(0, 120),
+              conversationId: String(conversation._id),
+            });
+          }
           return;
         }
 
@@ -160,6 +199,30 @@ export function initChatSocket(io) {
         }
 
         if (wantsHumanAdmin(text)) {
+          // If no admin has "Available" switched on, don't make the student
+          // sit through the handoff timeout at all — tell them right away
+          // and drop straight into the same fallback the timeout would've
+          // reached anyway (offer a callback email, keep chatting with bot).
+          if (!(await anyAdminAvailable())) {
+            conversation.status = "BOT";
+            conversation.awaitingContactEmail = true;
+            await conversation.save();
+
+            const noAdminMsg = await saveMessage(
+              conversation._id,
+              "bot",
+              NO_ADMIN_MESSAGE,
+            );
+            broadcastToConversation(
+              io,
+              adminNsp,
+              sessionId,
+              "chat:message",
+              noAdminMsg,
+            );
+            return;
+          }
+
           conversation.status = "WAITING_FOR_ADMIN";
           await conversation.save();
 
@@ -189,6 +252,14 @@ export function initChatSocket(io) {
             studentName: conversation.studentName,
             lastMessagePreview: studentMessage.text.slice(0, 140),
           });
+
+          findNotifiableAdmins().then((admins) =>
+            pushNotify(admins, {
+              title: "New student needs an admin",
+              body: studentMessage.text.slice(0, 120),
+              conversationId: String(conversation._id),
+            }),
+          );
 
           clearHandoffTimer(conversation._id);
           const timer = setTimeout(async () => {

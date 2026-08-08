@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   BookOpen,
   Bell,
+  BellOff,
   Users,
   CalendarDays,
   Quote,
@@ -25,8 +26,19 @@ import {
   UserCog,
   MessageSquareText,
   Database,
+  UserCheck,
+  UserX,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { Switch } from "./Ui";
+import { updateChatPreferences } from "../../api/client";
+import {
+  registerServiceWorker,
+  enablePushNotifications,
+  disablePushNotifications,
+} from "../../api/push";
+import { playAlertBeep } from "../../utils/beep";
+import { getAdminSocket } from "../../api/chatSocket";
 
 // Grouped, collapsible sidebar navigation — mirrors how most professional
 // admin panels (Shopify, WordPress, etc.) organize a growing list of screens
@@ -278,15 +290,145 @@ function SidebarContent({ onNavigate }) {
   );
 }
 
+// "Available" and "Notifications" toggles for live-chat handoff — see
+// server/sockets/chatSocket.js for what each one controls server-side.
+function LiveChatStatusControls() {
+  const { admin, updateAdmin } = useAuth();
+  const [busy, setBusy] = useState(null); // "available" | "notifications" | null
+  const [notice, setNotice] = useState("");
+
+  if (!admin) return null;
+
+  async function toggleAvailable(next) {
+    setBusy("available");
+    const prev = admin.available;
+    updateAdmin({ available: next });
+    try {
+      await updateChatPreferences({ available: next });
+    } catch (err) {
+      updateAdmin({ available: prev });
+      setNotice(err.message || "Couldn't update availability");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function toggleNotifications(next) {
+    setBusy("notifications");
+    setNotice("");
+    try {
+      if (next) {
+        const result = await enablePushNotifications();
+        if (!result.ok) {
+          const messages = {
+            not_supported: "This browser doesn't support push notifications.",
+            not_configured:
+              "Push notifications aren't set up on the server yet.",
+            permission_denied:
+              "Notification permission was blocked — allow it in your browser's site settings to enable this.",
+          };
+          setNotice(
+            messages[result.reason] || "Couldn't enable notifications.",
+          );
+          return;
+        }
+      } else {
+        await disablePushNotifications();
+      }
+      await updateChatPreferences({ notificationsEnabled: next });
+      updateAdmin({ notificationsEnabled: next });
+    } catch (err) {
+      setNotice(err.message || "Couldn't update notification setting");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  return (
+    <div className="flex items-center gap-4">
+      <div
+        className="hidden sm:flex items-center gap-2"
+        title="When off, students asking for a human are told immediately that no admin is available — no 5-minute wait."
+      >
+        {admin.available ? (
+          <UserCheck size={15} className="text-teal-600" />
+        ) : (
+          <UserX size={15} className="text-navy-400" />
+        )}
+        <span className="text-xs font-medium text-navy-600">Available</span>
+        <Switch
+          checked={!!admin.available}
+          disabled={busy === "available"}
+          onChange={toggleAvailable}
+        />
+      </div>
+      <div
+        className="hidden sm:flex items-center gap-2"
+        title="Get notified when a student needs an admin, even with this tab or browser closed."
+      >
+        {admin.notificationsEnabled ? (
+          <Bell size={15} className="text-teal-600" />
+        ) : (
+          <BellOff size={15} className="text-navy-400" />
+        )}
+        <span className="text-xs font-medium text-navy-600">Notifications</span>
+        <Switch
+          checked={!!admin.notificationsEnabled}
+          disabled={busy === "notifications"}
+          onChange={toggleNotifications}
+        />
+      </div>
+      {notice && (
+        <span className="hidden lg:block text-[11px] text-marigold-700 max-w-[220px]">
+          {notice}
+        </span>
+      )}
+    </div>
+  );
+}
+
 export default function AdminLayout() {
   const { admin } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [alert, setAlert] = useState(null);
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Close the mobile drawer whenever the route changes.
   useEffect(() => {
     setMobileOpen(false);
   }, [location.pathname]);
+
+  // Register the service worker once on login so it's ready to receive
+  // push events even before the admin has toggled Notifications on.
+  useEffect(() => {
+    if (admin) registerServiceWorker();
+  }, [admin]);
+
+  // In-app alert: every connected admin socket auto-joins the shared inbox
+  // room, so this fires for every logged-in admin regardless of which page
+  // they're on — covers the "browser open but tab not focused on chat" case
+  // alongside push notifications for the fully-closed-tab case.
+  useEffect(() => {
+    if (!admin) return;
+    const socket = getAdminSocket();
+    function handleEscalation(item) {
+      if (!admin.notificationsEnabled) return;
+      playAlertBeep();
+      setAlert({
+        studentName: item.studentName,
+        preview: item.lastMessagePreview,
+      });
+    }
+    socket.on("admin:escalation", handleEscalation);
+    return () => socket.off("admin:escalation", handleEscalation);
+  }, [admin]);
+
+  useEffect(() => {
+    if (!alert) return;
+    const t = setTimeout(() => setAlert(null), 7000);
+    return () => clearTimeout(t);
+  }, [alert]);
 
   return (
     <div className="h-screen flex bg-paper overflow-hidden">
@@ -317,11 +459,36 @@ export default function AdminLayout() {
           >
             <Menu size={22} />
           </button>
-          <p className="text-sm text-navy-500 hidden sm:block">Signed in as</p>
-          <p className="text-sm font-semibold text-navy-800 truncate">
-            {admin?.name} · {admin?.role}
-          </p>
+          <div className="hidden sm:block">
+            <p className="text-sm text-navy-500">Signed in as</p>
+            <p className="text-sm font-semibold text-navy-800 truncate">
+              {admin?.name} · {admin?.role}
+            </p>
+          </div>
+          <LiveChatStatusControls />
         </header>
+        {alert && (
+          <button
+            onClick={() => {
+              setAlert(null);
+              navigate("/admin/live-chat");
+            }}
+            className="mx-4 sm:mx-6 lg:mx-8 mt-4 text-left px-4 py-3 rounded-xl bg-marigold-50 border border-marigold-200 shadow-sm flex items-start gap-3 shrink-0"
+          >
+            <MessageSquareText
+              size={18}
+              className="text-marigold-600 mt-0.5 shrink-0"
+            />
+            <span className="min-w-0">
+              <span className="block text-sm font-semibold text-navy-800">
+                {alert.studentName || "A student"} needs an admin
+              </span>
+              <span className="block text-xs text-navy-500 truncate">
+                {alert.preview || "Tap to open Live Chat"}
+              </span>
+            </span>
+          </button>
+        )}
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
           <Outlet />
         </main>

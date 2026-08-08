@@ -450,7 +450,7 @@ export default function AdminLiveChat() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="Reply to student…"
-                    className="flex-1 min-w-0 px-3.5 py-2.5 text-sm rounded-full border border-navy-200 outline-none focus:border-marigold-300"
+                    className="flex-1 min-w-0 px-3.5 py-2.5 text-sm text-navy-800 placeholder:text-navy-400 bg-white rounded-full border border-navy-200 outline-none focus:border-marigold-300"
                   />
                   <button
                     type="submit"

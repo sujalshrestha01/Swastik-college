@@ -5,29 +5,7 @@ import {
   getSettings,
   updateVisibility,
 } from "../../api/client";
-import { Button, Banner } from "../../components/admin/Ui";
-
-// Toggle switch matching the rest of the admin UI kit's styling conventions.
-function Switch({ checked, onChange, disabled }) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
-      disabled={disabled}
-      onClick={() => onChange(!checked)}
-      className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
-        disabled ? "opacity-40 cursor-not-allowed" : "cursor-pointer"
-      } ${checked ? "bg-marigold-400" : "bg-navy-200"}`}
-    >
-      <span
-        className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
-          checked ? "translate-x-6" : "translate-x-1"
-        }`}
-      />
-    </button>
-  );
-}
+import { Button, Banner, Switch } from "../../components/admin/Ui";
 
 export default function AdminVisibility() {
   const [schema, setSchema] = useState(null);
