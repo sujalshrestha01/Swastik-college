@@ -1,36 +1,37 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   MessageCircle,
   X,
   Send,
-  ArrowLeft,
-  CheckCircle2,
   Bot,
   User,
+  UserCog,
+  Loader2,
 } from "lucide-react";
-import { getFaqs, submitContactForm } from "../api/client";
+import { getFaqs } from "../api/client";
+import { getStudentSocket, getChatSessionId } from "../api/chatSocket";
 
 /**
  * "Chat with Admissions" widget.
  *
- * Step 1: shows a list of FAQ questions (admin-managed via /admin/faq).
- * Step 2: tapping a question instantly shows its stored answer — this is
- *         answered entirely by the FAQ content, no admin/human involved.
- * Step 3: "Still need help?" drops into a short message form that goes to
- *         the same Inquiries inbox as the Contact page.
- *
- * Extension point for later: swap `answerFor(faq)` (or add a new branch in
- * handleAsk) to call an AI endpoint instead of/in addition to the stored
- * FAQ answer once that's ready — the chat-bubble UI here doesn't need to
- * change.
+ * - Tapping an FAQ chip shows its stored answer instantly, client-side —
+ *   no round trip, since that content is already known.
+ * - Typing a free-text question sends it over Socket.io to the server,
+ *   which answers using the PDF/knowledge-base-trained RAG bot.
+ * - Typing/tapping "Chat with admin" (or asking to talk to a person) hands
+ *   the conversation to a real admin in the Live Chat Management dashboard;
+ *   the bot goes quiet for this conversation until the admin ends the chat.
  */
 export default function ChatWithAdmissions({ onClose }) {
   const [faqs, setFaqs] = useState([]);
   const [loadingFaqs, setLoadingFaqs] = useState(true);
-  const [thread, setThread] = useState([]); // { role: 'bot' | 'user', text }
-  const [mode, setMode] = useState("faq"); // 'faq' | 'form'
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
-  const [formStatus, setFormStatus] = useState("idle"); // idle | sending | sent
+  const [messages, setMessages] = useState([]); // { key, sender: 'student'|'bot'|'admin', text }
+  const [status, setStatus] = useState("BOT"); // BOT | WAITING_FOR_ADMIN | ADMIN
+  const [input, setInput] = useState("");
+  const [sending, setSending] = useState(false);
+  const [connected, setConnected] = useState(false);
+  const bottomRef = useRef(null);
+  const localKeyRef = useRef(0);
 
   useEffect(() => {
     getFaqs().then((data) => {
@@ -39,38 +40,112 @@ export default function ChatWithAdmissions({ onClose }) {
     });
   }, []);
 
+  useEffect(() => {
+    const socket = getStudentSocket();
+    const sessionId = getChatSessionId();
+
+    function handleState({ status, messages: history }) {
+      setStatus(status);
+      setMessages(
+        (history || []).map((m) => ({
+          key: m._id,
+          sender: m.sender,
+          text: m.text,
+        })),
+      );
+      setConnected(true);
+    }
+    function handleMessage(message) {
+      setMessages((prev) => [
+        ...prev,
+        { key: message._id, sender: message.sender, text: message.text },
+      ]);
+      setSending(false);
+    }
+    function handleStatus({ status }) {
+      setStatus(status);
+    }
+    function handleError({ message }) {
+      setSending(false);
+      setMessages((prev) => [
+        ...prev,
+        { key: `err-${Date.now()}`, sender: "bot", text: message },
+      ]);
+    }
+
+    socket.on("connect", () => socket.emit("student:join", { sessionId }));
+    socket.on("conversation:state", handleState);
+    socket.on("chat:message", handleMessage);
+    socket.on("conversation:status", handleStatus);
+    socket.on("chat:error", handleError);
+
+    if (socket.connected) socket.emit("student:join", { sessionId });
+
+    return () => {
+      socket.off("connect");
+      socket.off("conversation:state", handleState);
+      socket.off("chat:message", handleMessage);
+      socket.off("conversation:status", handleStatus);
+      socket.off("chat:error", handleError);
+    };
+  }, []);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, sending]);
+
+  function sendText(text) {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    setSending(true);
+    setInput("");
+    getStudentSocket().emit("student:message", {
+      sessionId: getChatSessionId(),
+      text: trimmed,
+    });
+  }
+
   function handleAsk(faq) {
-    setThread((prev) => [
+    localKeyRef.current += 1;
+    setMessages((prev) => [
       ...prev,
-      { role: "user", text: faq.question },
-      { role: "bot", text: faq.answer },
+      { key: `local-q-${localKeyRef.current}`, sender: "student", text: faq.question },
+      { key: `local-a-${localKeyRef.current}`, sender: "bot", text: faq.answer },
     ]);
   }
 
-  async function handleFormSubmit(e) {
+  function handleSubmit(e) {
     e.preventDefault();
-    setFormStatus("sending");
-    await submitContactForm({
-      ...form,
-      message: `[Live chat] ${form.message}`,
-    });
-    setFormStatus("sent");
+    sendText(input);
   }
+
+  const statusLabel =
+    status === "ADMIN"
+      ? "Connected with an admissions officer"
+      : status === "WAITING_FOR_ADMIN"
+        ? "Waiting for an admissions officer…"
+        : "Usually answers instantly";
 
   return (
     <div className="w-[92vw] max-w-sm bg-white dark:bg-navy-800 rounded-2xl shadow-2xl border border-navy-100 dark:border-navy-700 flex flex-col overflow-hidden max-h-[70vh]">
       {/* Header */}
       <div className="bg-navy-800 dark:bg-navy-900 text-white px-4 py-3.5 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2.5">
-          <span className="w-8 h-8 rounded-full bg-marigold-400 text-navy-900 flex items-center justify-center">
-            <Bot size={16} />
+          <span
+            className={`w-8 h-8 rounded-full flex items-center justify-center ${
+              status === "ADMIN"
+                ? "bg-teal-400 text-navy-900"
+                : "bg-marigold-400 text-navy-900"
+            }`}
+          >
+            {status === "ADMIN" ? <UserCog size={16} /> : <Bot size={16} />}
           </span>
           <div>
             <p className="text-sm font-semibold leading-tight">
-              Admissions Assistant
+              {status === "ADMIN" ? "Admissions Officer" : "Admissions Assistant"}
             </p>
             <p className="text-[11px] text-navy-300 leading-tight">
-              Usually answers instantly
+              {statusLabel}
             </p>
           </div>
         </div>
@@ -81,136 +156,113 @@ export default function ChatWithAdmissions({ onClose }) {
 
       {/* Body */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-paper dark:bg-navy-900/40">
-        {mode === "faq" ? (
-          <>
-            <div className="flex gap-2 items-start">
-              <span className="w-6 h-6 rounded-full bg-navy-100 dark:bg-navy-700 flex items-center justify-center shrink-0 mt-0.5">
-                <Bot size={12} className="text-navy-500" />
-              </span>
-              <p className="text-sm bg-white dark:bg-navy-800 border border-navy-100 dark:border-navy-700 rounded-2xl rounded-tl-sm px-3.5 py-2.5 text-navy-700 dark:text-navy-100">
-                Hi! Tap a question below for an instant answer, or message
-                admissions directly if you don't see what you need.
-              </p>
-            </div>
+        <div className="flex gap-2 items-start">
+          <span className="w-6 h-6 rounded-full bg-navy-100 dark:bg-navy-700 flex items-center justify-center shrink-0 mt-0.5">
+            <Bot size={12} className="text-navy-500" />
+          </span>
+          <p className="text-sm bg-white dark:bg-navy-800 border border-navy-100 dark:border-navy-700 rounded-2xl rounded-tl-sm px-3.5 py-2.5 text-navy-700 dark:text-navy-100">
+            Hi! Ask me anything about admissions, courses, or the college —
+            or tap a question below. Type "chat with admin" any time to
+            reach a real person.
+          </p>
+        </div>
 
-            {thread.map((msg, i) => (
-              <div
-                key={i}
-                className={`flex gap-2 items-start ${msg.role === "user" ? "flex-row-reverse" : ""}`}
-              >
-                <span
-                  className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
-                    msg.role === "user"
-                      ? "bg-marigold-400 text-navy-900"
-                      : "bg-navy-100 dark:bg-navy-700 text-navy-500"
-                  }`}
-                >
-                  {msg.role === "user" ? <User size={12} /> : <Bot size={12} />}
-                </span>
-                <p
-                  className={`text-sm rounded-2xl px-3.5 py-2.5 max-w-[80%] ${
-                    msg.role === "user"
-                      ? "bg-marigold-400 text-navy-900 rounded-tr-sm"
-                      : "bg-white dark:bg-navy-800 border border-navy-100 dark:border-navy-700 text-navy-700 dark:text-navy-100 rounded-tl-sm"
-                  }`}
-                >
-                  {msg.text}
-                </p>
-              </div>
-            ))}
-
-            {loadingFaqs ? (
-              <p className="text-xs text-navy-400 text-center py-4">
-                Loading questions…
-              </p>
-            ) : faqs.length === 0 ? (
-              <p className="text-xs text-navy-400 text-center py-4">
-                No FAQs added yet.
-              </p>
-            ) : (
-              <div className="flex flex-wrap gap-2 pt-1">
-                {faqs.map((f) => (
-                  <button
-                    key={f._id}
-                    onClick={() => handleAsk(f)}
-                    className="text-xs font-medium bg-white dark:bg-navy-800 border border-teal-200 dark:border-teal-700 text-teal-700 dark:text-teal-300 px-3 py-1.5 rounded-full hover:bg-teal-50 dark:hover:bg-teal-900/30 transition-colors"
-                  >
-                    {f.question}
-                  </button>
-                ))}
-              </div>
-            )}
-          </>
-        ) : formStatus === "sent" ? (
-          <div className="text-center py-6">
-            <CheckCircle2
-              className="mx-auto text-teal-600 dark:text-teal-400 mb-2"
-              size={30}
-            />
-            <p className="text-sm font-semibold text-navy-800 dark:text-paper">
-              Message sent!
-            </p>
-            <p className="text-xs text-navy-400 mt-1">
-              Admissions will follow up by email soon.
+        {messages.map((msg) => (
+          <div
+            key={msg.key}
+            className={`flex gap-2 items-start ${msg.sender === "student" ? "flex-row-reverse" : ""}`}
+          >
+            <span
+              className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${
+                msg.sender === "student"
+                  ? "bg-marigold-400 text-navy-900"
+                  : msg.sender === "admin"
+                    ? "bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300"
+                    : "bg-navy-100 dark:bg-navy-700 text-navy-500"
+              }`}
+            >
+              {msg.sender === "student" ? (
+                <User size={12} />
+              ) : msg.sender === "admin" ? (
+                <UserCog size={12} />
+              ) : (
+                <Bot size={12} />
+              )}
+            </span>
+            <p
+              className={`text-sm rounded-2xl px-3.5 py-2.5 max-w-[80%] whitespace-pre-wrap ${
+                msg.sender === "student"
+                  ? "bg-marigold-400 text-navy-900 rounded-tr-sm"
+                  : "bg-white dark:bg-navy-800 border border-navy-100 dark:border-navy-700 text-navy-700 dark:text-navy-100 rounded-tl-sm"
+              }`}
+            >
+              {msg.text}
             </p>
           </div>
-        ) : (
-          <form onSubmit={handleFormSubmit} className="space-y-3">
-            <button
-              type="button"
-              onClick={() => setMode("faq")}
-              className="text-xs text-navy-400 hover:text-navy-600 inline-flex items-center gap-1 mb-1"
-            >
-              <ArrowLeft size={12} /> Back to questions
-            </button>
-            <input
-              required
-              placeholder="Your name"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full px-3 py-2 text-sm rounded-lg border border-navy-100 dark:border-navy-700 bg-white dark:bg-navy-800 outline-none focus:border-marigold-300"
-            />
-            <input
-              required
-              type="email"
-              placeholder="Your email"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="w-full px-3 py-2 text-sm rounded-lg border border-navy-100 dark:border-navy-700 bg-white dark:bg-navy-800 outline-none focus:border-marigold-300"
-            />
-            <textarea
-              required
-              rows={3}
-              placeholder="What would you like to ask?"
-              value={form.message}
-              onChange={(e) => setForm({ ...form, message: e.target.value })}
-              className="w-full px-3 py-2 text-sm rounded-lg border border-navy-100 dark:border-navy-700 bg-white dark:bg-navy-800 outline-none focus:border-marigold-300 resize-none"
-            />
-            <button
-              type="submit"
-              disabled={formStatus === "sending"}
-              className="w-full inline-flex items-center justify-center gap-2 bg-marigold hover:bg-marigold-500 disabled:opacity-60 text-navy-900 font-semibold text-sm px-4 py-2.5 rounded-full transition-colors"
-            >
-              {formStatus === "sending" ? (
-                "Sending…"
-              ) : (
-                <>
-                  <Send size={14} /> Send to Admissions
-                </>
-              )}
-            </button>
-          </form>
+        ))}
+
+        {sending && (
+          <div className="flex gap-2 items-start">
+            <span className="w-6 h-6 rounded-full bg-navy-100 dark:bg-navy-700 flex items-center justify-center shrink-0 mt-0.5">
+              <Loader2 size={12} className="text-navy-500 animate-spin" />
+            </span>
+            <p className="text-sm bg-white dark:bg-navy-800 border border-navy-100 dark:border-navy-700 rounded-2xl rounded-tl-sm px-3.5 py-2.5 text-navy-400 italic">
+              Typing…
+            </p>
+          </div>
         )}
+
+        {!loadingFaqs && faqs.length > 0 && messages.length === 0 && (
+          <div className="flex flex-wrap gap-2 pt-1">
+            {faqs.map((f) => (
+              <button
+                key={f._id}
+                onClick={() => handleAsk(f)}
+                className="text-xs font-medium bg-white dark:bg-navy-800 border border-teal-200 dark:border-teal-700 text-teal-700 dark:text-teal-300 px-3 py-1.5 rounded-full hover:bg-teal-50 dark:hover:bg-teal-900/30 transition-colors"
+              >
+                {f.question}
+              </button>
+            ))}
+          </div>
+        )}
+        <div ref={bottomRef} />
       </div>
 
-      {/* Footer action */}
-      {mode === "faq" && (
-        <div className="px-4 py-3 border-t border-navy-100 dark:border-navy-700 shrink-0">
+      {/* Input */}
+      <form
+        onSubmit={handleSubmit}
+        className="px-3 py-3 border-t border-navy-100 dark:border-navy-700 shrink-0 flex items-center gap-2"
+      >
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder={
+            !connected
+              ? "Connecting…"
+              : status === "WAITING_FOR_ADMIN"
+                ? "An admin will be with you shortly…"
+                : "Type your question…"
+          }
+          disabled={!connected}
+          className="flex-1 min-w-0 px-3.5 py-2.5 text-sm rounded-full border border-navy-100 dark:border-navy-700 bg-white dark:bg-navy-800 text-navy-800 dark:text-paper outline-none focus:border-marigold-300 disabled:opacity-60"
+        />
+        <button
+          type="submit"
+          disabled={!connected || !input.trim() || sending}
+          aria-label="Send"
+          className="w-10 h-10 shrink-0 rounded-full bg-marigold hover:bg-marigold-500 disabled:opacity-50 text-navy-900 flex items-center justify-center transition-colors"
+        >
+          <Send size={16} />
+        </button>
+      </form>
+      {status === "BOT" && (
+        <div className="px-3 pb-3 -mt-1 shrink-0">
           <button
-            onClick={() => setMode("form")}
-            className="w-full text-sm font-medium text-navy-700 dark:text-navy-100 bg-navy-50 dark:bg-navy-800 hover:bg-navy-100 dark:hover:bg-navy-700 rounded-full py-2.5 flex items-center justify-center gap-2 transition-colors"
+            onClick={() => sendText("chat with admin")}
+            disabled={!connected}
+            className="w-full text-xs font-medium text-navy-500 dark:text-navy-300 hover:text-navy-800 dark:hover:text-white transition-colors py-1"
           >
-            <MessageCircle size={15} /> Still need help? Message admissions
+            Prefer to talk to a person? Chat with admin →
           </button>
         </div>
       )}

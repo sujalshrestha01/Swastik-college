@@ -358,3 +358,29 @@ export const blogAdmin = {
     apiCall(`/blogs/${id}`, { method: "PUT", body: JSON.stringify(payload) }),
   remove: (id) => apiCall(`/blogs/${id}`, { method: "DELETE" }),
 };
+
+// ---------- Knowledge Base (PDFs the "Chat with Admissions" bot is trained on) ----------
+// Returns { doc } — doc.status starts "processing", flips to "ready" once
+// chunking/embedding finishes in the background (poll getKnowledgeDocs()).
+export function uploadKnowledgePdf(file) {
+  const formData = new FormData();
+  formData.append("pdf", file);
+  return apiCall("/knowledge/upload", { method: "POST", body: formData });
+}
+export function getKnowledgeDocs() {
+  return apiCall("/knowledge");
+}
+export function deleteKnowledgeDoc(id) {
+  return apiCall(`/knowledge/${id}`, { method: "DELETE" });
+}
+
+// ---------- Chat with Admissions — conversation history (admin dashboard) ----------
+// Real-time messaging itself happens over Socket.io (see api/chatSocket.js);
+// these two just power the admin's inbox list + "load past messages" views.
+export function getConversations(status) {
+  const qs = status ? `?status=${status}` : "";
+  return apiCall(`/chat/conversations${qs}`);
+}
+export function getConversationMessages(id) {
+  return apiCall(`/chat/conversations/${id}/messages`);
+}

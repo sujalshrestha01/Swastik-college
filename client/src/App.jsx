@@ -41,6 +41,8 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import AdminVisibility from "./pages/admin/AdminVisibility";
 import AdminAcademics from "./pages/admin/AdminAcademics";
 import AdminFAQ from "./pages/admin/AdminFAQ";
+import AdminLiveChat from "./pages/admin/AdminLiveChat";
+import AdminKnowledgeBase from "./pages/admin/AdminKnowledgeBase";
 import NonCreditCourses from "./pages/NonCreditCourses";
 import { PageGate } from "./components/Visibility";
 
@@ -196,6 +198,8 @@ export default function App() {
               <Route path="gallery" element={<AdminGallery />} />
               <Route path="messages" element={<AdminMessages />} />
               <Route path="faq" element={<AdminFAQ />} />
+              <Route path="live-chat" element={<AdminLiveChat />} />
+              <Route path="knowledge-base" element={<AdminKnowledgeBase />} />
               <Route path="visibility" element={<AdminVisibility />} />
               <Route path="settings" element={<AdminSettings />} />
               <Route path="users" element={<AdminUsers />} />

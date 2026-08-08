@@ -23,6 +23,8 @@ import {
   FileDown,
   Handshake,
   UserCog,
+  MessageSquareText,
+  Database,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
@@ -77,6 +79,8 @@ const navGroups = [
     items: [
       { to: "/admin/messages", label: "Inquiries", icon: Mail },
       { to: "/admin/faq", label: "FAQs (Chat Widget)", icon: HelpCircle },
+      { to: "/admin/live-chat", label: "Live Chat", icon: MessageSquareText },
+      { to: "/admin/knowledge-base", label: "Knowledge Base", icon: Database },
     ],
   },
   {

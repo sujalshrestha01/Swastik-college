@@ -5,7 +5,10 @@ import rateLimit from "express-rate-limit";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
+import { createServer } from "http";
+import { Server } from "socket.io";
 import { connectDB } from "./config/db.js";
+import { initChatSocket } from "./sockets/chatSocket.js";
 import authRouter from "./routes/auth.js";
 import settingsRouter from "./routes/settings.js";
 import noticesRouter from "./routes/notices.js";
@@ -22,6 +25,8 @@ import uploadRouter from "./routes/upload.js";
 import skillCoursesRouter from "./routes/skillCourses.js";
 import workshopsRouter from "./routes/workshops.js";
 import faqRouter from "./routes/faq.js";
+import knowledgeRouter from "./routes/knowledge.js";
+import chatRouter from "./routes/chat.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -87,6 +92,8 @@ app.use("/api/upload", uploadRouter);
 app.use("/api/skill-courses", skillCoursesRouter);
 app.use("/api/workshops", workshopsRouter);
 app.use("/api/faqs", faqRouter);
+app.use("/api/knowledge", knowledgeRouter);
+app.use("/api/chat", chatRouter);
 
 // 404 handler for unknown API routes
 app.use("/api", (req, res) => {
@@ -101,8 +108,23 @@ app.use((err, req, res, next) => {
     .json({ message: err.message || "Something went wrong" });
 });
 
+// Wrap the Express app in a plain http server so Socket.io can share the
+// same port — the chat widget and admin dashboard both talk to this one
+// server, no separate real-time service to host or pay for.
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin))
+        return callback(null, true);
+      callback(new Error("Not allowed by CORS"));
+    },
+  },
+});
+initChatSocket(io);
+
 connectDB().then(() => {
-  app.listen(PORT, () => {
+  httpServer.listen(PORT, () => {
     console.log(`Swastik College API running on http://localhost:${PORT}`);
   });
 });
