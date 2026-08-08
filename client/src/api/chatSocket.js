@@ -12,16 +12,23 @@ export function getStudentSocket() {
   return studentSocket;
 }
 
-// Each browser tab gets a stable random ID for the lifetime of the tab, so
-// refreshing the page keeps the same conversation instead of starting a new
-// one. No student login required.
+// Each browser gets a stable random ID that persists across tab closes and
+// browser restarts (localStorage, not sessionStorage) — so a student who
+// accidentally closes the tab mid-conversation with an admin doesn't lose
+// their thread. They can still start fresh via resetChatSession() (wired to
+// a "New conversation" button in the widget).
 const SESSION_KEY = "swastik_chat_session_id";
 export function getChatSessionId() {
-  let id = sessionStorage.getItem(SESSION_KEY);
+  let id = localStorage.getItem(SESSION_KEY);
   if (!id) {
     id = crypto.randomUUID();
-    sessionStorage.setItem(SESSION_KEY, id);
+    localStorage.setItem(SESSION_KEY, id);
   }
+  return id;
+}
+export function resetChatSession() {
+  const id = crypto.randomUUID();
+  localStorage.setItem(SESSION_KEY, id);
   return id;
 }
 

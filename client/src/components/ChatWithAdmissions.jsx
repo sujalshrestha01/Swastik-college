@@ -7,26 +7,20 @@ import {
   User,
   UserCog,
   Loader2,
+  RotateCcw,
 } from "lucide-react";
 import { getFaqs } from "../api/client";
-import { getStudentSocket, getChatSessionId } from "../api/chatSocket";
+import {
+  getStudentSocket,
+  getChatSessionId,
+  resetChatSession,
+} from "../api/chatSocket";
 
-/**
- * "Chat with Admissions" widget.
- *
- * - Tapping an FAQ chip shows its stored answer instantly, client-side —
- *   no round trip, since that content is already known.
- * - Typing a free-text question sends it over Socket.io to the server,
- *   which answers using the PDF/knowledge-base-trained RAG bot.
- * - Typing/tapping "Chat with admin" (or asking to talk to a person) hands
- *   the conversation to a real admin in the Live Chat Management dashboard;
- *   the bot goes quiet for this conversation until the admin ends the chat.
- */
 export default function ChatWithAdmissions({ onClose }) {
   const [faqs, setFaqs] = useState([]);
   const [loadingFaqs, setLoadingFaqs] = useState(true);
-  const [messages, setMessages] = useState([]); // { key, sender: 'student'|'bot'|'admin', text }
-  const [status, setStatus] = useState("BOT"); // BOT | WAITING_FOR_ADMIN | ADMIN
+  const [messages, setMessages] = useState([]);
+  const [status, setStatus] = useState("BOT");
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [connected, setConnected] = useState(false);
@@ -109,14 +103,36 @@ export default function ChatWithAdmissions({ onClose }) {
     localKeyRef.current += 1;
     setMessages((prev) => [
       ...prev,
-      { key: `local-q-${localKeyRef.current}`, sender: "student", text: faq.question },
-      { key: `local-a-${localKeyRef.current}`, sender: "bot", text: faq.answer },
+      {
+        key: `local-q-${localKeyRef.current}`,
+        sender: "student",
+        text: faq.question,
+      },
+      {
+        key: `local-a-${localKeyRef.current}`,
+        sender: "bot",
+        text: faq.answer,
+      },
     ]);
   }
 
   function handleSubmit(e) {
     e.preventDefault();
     sendText(input);
+  }
+
+  function handleNewConversation() {
+    if (
+      !confirm(
+        "Start a new conversation? Your current chat history will no longer be shown here (it's still safely on file if you need to reference it later).",
+      )
+    )
+      return;
+    const newId = resetChatSession();
+    setMessages([]);
+    setStatus("BOT");
+    setSending(false);
+    getStudentSocket().emit("student:join", { sessionId: newId });
   }
 
   const statusLabel =
@@ -142,7 +158,9 @@ export default function ChatWithAdmissions({ onClose }) {
           </span>
           <div>
             <p className="text-sm font-semibold leading-tight">
-              {status === "ADMIN" ? "Admissions Officer" : "Admissions Assistant"}
+              {status === "ADMIN"
+                ? "Admissions Officer"
+                : "Admissions Assistant"}
             </p>
             <p className="text-[11px] text-navy-300 leading-tight">
               {statusLabel}
@@ -153,6 +171,16 @@ export default function ChatWithAdmissions({ onClose }) {
           <X size={18} />
         </button>
       </div>
+      {messages.length > 0 && (
+        <div className="px-4 py-1.5 border-b border-navy-100 dark:border-navy-700 bg-navy-50 dark:bg-navy-900/60 shrink-0">
+          <button
+            onClick={handleNewConversation}
+            className="text-[11px] font-medium text-navy-400 hover:text-navy-700 dark:hover:text-navy-100 flex items-center gap-1"
+          >
+            <RotateCcw size={11} /> Start a new conversation
+          </button>
+        </div>
+      )}
 
       {/* Body */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-paper dark:bg-navy-900/40">
@@ -161,9 +189,9 @@ export default function ChatWithAdmissions({ onClose }) {
             <Bot size={12} className="text-navy-500" />
           </span>
           <p className="text-sm bg-white dark:bg-navy-800 border border-navy-100 dark:border-navy-700 rounded-2xl rounded-tl-sm px-3.5 py-2.5 text-navy-700 dark:text-navy-100">
-            Hi! Ask me anything about admissions, courses, or the college —
-            or tap a question below. Type "chat with admin" any time to
-            reach a real person.
+            Hi! Ask me anything about admissions, courses, or the college — or
+            tap a question below. Type "chat with admin" any time to reach a
+            real person.
           </p>
         </div>
 
