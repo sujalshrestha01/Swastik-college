@@ -21,6 +21,13 @@ const chatConversationSchema = new mongoose.Schema(
     assignedAdmin: { type: mongoose.Schema.Types.ObjectId, ref: "Admin" },
     lastMessageAt: { type: Date, default: Date.now },
     lastMessagePreview: { type: String, default: "" },
+    // Set true right after a "no admin available" timeout fires, so the
+    // very next student message gets checked for an email address instead
+    // of going straight through the normal bot Q&A flow.
+    awaitingContactEmail: { type: Boolean, default: false },
+    // Captured once a student leaves an email for a callback when no admin
+    // was available in time. Surfaced in the admin History view.
+    contactEmail: { type: String, default: "" },
   },
   { timestamps: true },
 );

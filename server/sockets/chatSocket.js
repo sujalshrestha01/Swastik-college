@@ -7,17 +7,29 @@ import { wantsHumanAdmin } from "../services/intentService.js";
 const ADMIN_INBOX_ROOM = "admin:inbox";
 const HOLDING_MESSAGE =
   "Connecting you to an admission officer — someone will be with you shortly.";
+const NO_ADMIN_MESSAGE =
+  "Our admissions team isn't available right now. If you'd like a callback, just type your email address and we'll follow up. Otherwise, feel free to keep asking me questions in the meantime.";
+const EMAIL_CAPTURED_MESSAGE =
+  "Got it — we'll follow up at that email soon. Feel free to keep asking me questions too.";
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const HANDOFF_TIMEOUT_MS =
+  (Number(process.env.HANDOFF_TIMEOUT_MINUTES) || 5) * 60 * 1000;
+
+const pendingHandoffTimers = new Map();
+
+function clearHandoffTimer(conversationId) {
+  const timer = pendingHandoffTimers.get(String(conversationId));
+  if (timer) {
+    clearTimeout(timer);
+    pendingHandoffTimers.delete(String(conversationId));
+  }
+}
 
 function conversationRoom(sessionId) {
   return `conv:${sessionId}`;
 }
 
-// Socket.io rooms are scoped per namespace — a student (default "/"
-// namespace) and an admin (in the "/admin" namespace) who both "joined"
-// room "conv:xyz" are actually in two separate rooms that happen to share a
-// name. `io.to(room).emit(...)` alone only reaches the student side. This
-// helper emits to both namespaces' copies of the room so the message/status
-// event reaches whichever side (or both) is currently connected to it.
 function broadcastToConversation(io, adminNsp, sessionId, event, payload) {
   const room = conversationRoom(sessionId);
   io.to(room).emit(event, payload);
@@ -39,9 +51,6 @@ async function saveMessage(conversationId, sender, text, sourceChunkIds = []) {
 }
 
 export function initChatSocket(io) {
-  // Two logical groups sharing one server: students connect to "/" with no
-  // auth (public chat widget), admins connect to "/admin" and must present
-  // a valid JWT (the same one the REST API uses) in the handshake.
   const adminNsp = io.of("/admin");
 
   adminNsp.use((socket, next) => {
@@ -59,7 +68,6 @@ export function initChatSocket(io) {
     }
   });
 
-  // ---------- Student-facing namespace (public) ----------
   io.on("connection", (socket) => {
     socket.on("student:join", async ({ sessionId, studentName }) => {
       if (!sessionId) return;
@@ -115,7 +123,6 @@ export function initChatSocket(io) {
           "chat:message",
           studentMessage,
         );
-        // Let admins watching the inbox see activity on waiting/active chats too.
         adminNsp.to(ADMIN_INBOX_ROOM).emit("admin:conversation_updated", {
           conversationId: conversation._id,
           lastMessagePreview: studentMessage.text.slice(0, 140),
@@ -126,12 +133,32 @@ export function initChatSocket(io) {
           conversation.status === "ADMIN" ||
           conversation.status === "WAITING_FOR_ADMIN"
         ) {
-          // A human is (or will be) handling this — the bot stays silent.
           return;
         }
 
-        // BOT mode: check for a handoff request first (free, instant),
-        // otherwise answer via RAG.
+        if (conversation.awaitingContactEmail) {
+          conversation.awaitingContactEmail = false;
+          const trimmed = text.trim();
+          if (EMAIL_REGEX.test(trimmed)) {
+            conversation.contactEmail = trimmed;
+            await conversation.save();
+            const confirmMsg = await saveMessage(
+              conversation._id,
+              "bot",
+              EMAIL_CAPTURED_MESSAGE,
+            );
+            broadcastToConversation(
+              io,
+              adminNsp,
+              sessionId,
+              "chat:message",
+              confirmMsg,
+            );
+            return;
+          }
+          await conversation.save();
+        }
+
         if (wantsHumanAdmin(text)) {
           conversation.status = "WAITING_FOR_ADMIN";
           await conversation.save();
@@ -162,6 +189,43 @@ export function initChatSocket(io) {
             studentName: conversation.studentName,
             lastMessagePreview: studentMessage.text.slice(0, 140),
           });
+
+          clearHandoffTimer(conversation._id);
+          const timer = setTimeout(async () => {
+            pendingHandoffTimers.delete(String(conversation._id));
+            try {
+              const fresh = await ChatConversation.findById(conversation._id);
+              if (!fresh || fresh.status !== "WAITING_FOR_ADMIN") return;
+              fresh.status = "BOT";
+              fresh.awaitingContactEmail = true;
+              await fresh.save();
+              const fallbackMsg = await saveMessage(
+                fresh._id,
+                "bot",
+                NO_ADMIN_MESSAGE,
+              );
+              broadcastToConversation(
+                io,
+                adminNsp,
+                fresh.sessionId,
+                "chat:message",
+                fallbackMsg,
+              );
+              broadcastToConversation(
+                io,
+                adminNsp,
+                fresh.sessionId,
+                "conversation:status",
+                { status: "BOT" },
+              );
+              adminNsp.to(ADMIN_INBOX_ROOM).emit("admin:conversation_updated", {
+                conversationId: fresh._id,
+              });
+            } catch (err) {
+              console.error("handoff timeout error:", err);
+            }
+          }, HANDOFF_TIMEOUT_MS);
+          pendingHandoffTimers.set(String(conversation._id), timer);
           return;
         }
 
@@ -184,15 +248,12 @@ export function initChatSocket(io) {
       } catch (err) {
         console.error("student:message error:", err);
         socket.emit("chat:error", {
-          message:
-            err?.userMessage ||
-            "Something went wrong answering that — please try again.",
+          message: "Something went wrong answering that — please try again.",
         });
       }
     });
   });
 
-  // ---------- Admin-facing namespace (authenticated) ----------
   adminNsp.on("connection", (socket) => {
     socket.join(ADMIN_INBOX_ROOM);
 
@@ -214,6 +275,7 @@ export function initChatSocket(io) {
         const conversation = await ChatConversation.findById(conversationId);
         if (!conversation) return;
 
+        clearHandoffTimer(conversation._id);
         conversation.status = "ADMIN";
         conversation.assignedAdmin = socket.admin.id;
         await conversation.save();
