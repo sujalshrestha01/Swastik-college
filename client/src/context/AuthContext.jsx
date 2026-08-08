@@ -6,6 +6,7 @@ import {
   useCallback,
 } from "react";
 import { getToken, setToken, fetchMe, login as apiLogin } from "../api/client";
+import { disablePushNotifications, enablePushNotifications } from "../api/push";
 
 const AuthContext = createContext(null);
 
@@ -38,10 +39,31 @@ export function AuthProvider({ children }) {
     const { token, admin } = await apiLogin(email, password);
     setToken(token);
     setAdmin(admin);
+
+    // The toggle already says "on" (that flag lives on the account, not
+    // the browser), but logout() deliberately tears down the actual push
+    // subscription — so without this, the toggle would look on while
+    // being silently dead until manually re-toggled. Browser permission
+    // was already granted the first time, so this re-subscribes quietly,
+    // no permission popup. Best-effort: never block login if it fails.
+    if (admin?.notificationsEnabled) {
+      enablePushNotifications().catch(() => {});
+    }
+
     return admin;
   }
 
-  function logout() {
+  async function logout() {
+    // Unsubscribe this device from push *before* clearing the token —
+    // the unsubscribe endpoint needs auth, and once the token's gone it
+    // can't reach the server. Otherwise this browser stays subscribed
+    // forever after logout, silently getting pinged about students it
+    // no longer has dashboard access to respond to.
+    try {
+      await disablePushNotifications();
+    } catch {
+      // Best-effort — don't block logout if this fails (e.g. offline).
+    }
     setToken(null);
     setAdmin(null);
   }

@@ -34,6 +34,7 @@ import { Switch } from "./Ui";
 import { updateChatPreferences } from "../../api/client";
 import {
   registerServiceWorker,
+  checkPushHealth,
   enablePushNotifications,
   disablePushNotifications,
 } from "../../api/push";
@@ -395,6 +396,7 @@ export default function AdminLayout() {
   const { admin } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [alert, setAlert] = useState(null);
+  const [pushWarning, setPushWarning] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -402,6 +404,19 @@ export default function AdminLayout() {
   useEffect(() => {
     setMobileOpen(false);
   }, [location.pathname]);
+
+  // Health check runs on every dashboard load (not just fresh logins) —
+  // catches any staleness however it happened. Silently repairs when it
+  // can; surfaces a real warning when it can't (permission blocked).
+  useEffect(() => {
+    if (!admin?.notificationsEnabled) {
+      setPushWarning(false);
+      return;
+    }
+    checkPushHealth().then((result) => {
+      setPushWarning(result.status === "blocked");
+    });
+  }, [admin?.notificationsEnabled]);
 
   // Register the service worker once on login so it's ready to receive
   // push events even before the admin has toggled Notifications on.
@@ -477,6 +492,16 @@ export default function AdminLayout() {
             </p>
           </div>
           <LiveChatStatusControls />
+          {pushWarning && (
+            <div className="mx-4 sm:mx-6 lg:mx-8 mt-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 shadow-sm flex items-start gap-3 shrink-0">
+              <BellOff size={18} className="text-red-500 mt-0.5 shrink-0" />
+              <span className="min-w-0 text-sm text-red-700">
+                Notifications are switched on, but this browser has blocked them
+                — you won't actually receive any here. Allow notifications for
+                this site in your browser's settings, then reload this page.
+              </span>
+            </div>
+          )}
         </header>
         {alert && (
           <button

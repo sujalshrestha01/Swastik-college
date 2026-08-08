@@ -60,9 +60,17 @@ async function sendToAdmin(admin, payload) {
   );
 
   if (deadEndpoints.length > 0) {
-    await Admin.findByIdAndUpdate(admin._id, {
+    const remaining = subs.filter((s) => !deadEndpoints.includes(s.endpoint));
+    const update = {
       $pull: { pushSubscriptions: { endpoint: { $in: deadEndpoints } } },
-    });
+    };
+    // Every subscription for this admin is now gone — leaving
+    // notificationsEnabled: true would keep claiming push works when
+    // there's nothing left to push to.
+    if (remaining.length === 0) {
+      update.notificationsEnabled = false;
+    }
+    await Admin.findByIdAndUpdate(admin._id, update);
   }
 }
 

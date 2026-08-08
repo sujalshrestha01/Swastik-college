@@ -76,3 +76,40 @@ export async function disablePushNotifications() {
     // the browser-side subscription too.
   }
 }
+
+// Checks whether this browser's push setup actually matches what the
+// account claims ("notificationsEnabled: true" is a DB flag — it says
+// nothing about whether *this* browser currently holds a live
+// subscription). Called on every dashboard load, not just login, so
+// staleness from any cause (subscription silently expired, browser data
+// cleared, etc.) gets caught the next time the admin opens the dashboard
+// rather than staying invisible indefinitely.
+//
+// Returns one of:
+//   { status: "ok" }              — subscribed and everything matches
+//   { status: "repaired" }        — was stale, silently fixed it
+//   { status: "blocked" }         — browser permission denied; nothing
+//                                    we can do without the admin manually
+//                                    changing their browser's site settings
+//   { status: "unsupported" }     — this browser can't do push at all
+export async function checkPushHealth() {
+  if (!pushSupported()) return { status: "unsupported" };
+
+  if (Notification.permission === "denied") {
+    return { status: "blocked" };
+  }
+
+  try {
+    const registration = await navigator.serviceWorker.ready;
+    const existing = await registration.pushManager.getSubscription();
+    if (existing) return { status: "ok" };
+
+    if (Notification.permission === "granted") {
+      const result = await enablePushNotifications();
+      return result.ok ? { status: "repaired" } : { status: "blocked" };
+    }
+    return { status: "blocked" };
+  } catch {
+    return { status: "blocked" };
+  }
+}
